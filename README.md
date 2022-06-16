@@ -63,7 +63,7 @@ Please see  [Histoqc](https://github.com/choosehappy/HistoQC), this is an open-s
 ---
 The parameters CohortFinder used are as below:
 
-![Screen Shot 2022-06-15 at 10.15.02 PM](/Users/fanfan/Desktop/Screen Shot 2022-06-15 at 10.15.02 PM.png)
+![Screen Shot 2022-06-15 at 10.15.02 PM](/figs/config.png)
 
 
 
@@ -94,15 +94,15 @@ The cohortfinder_result.tsv has two more columns than the histoqc tsc file. One 
 
 Each point represents a patient and different colors represent different batch effect groups
 
-<img src="/Users/fanfan/Desktop/cohortfinder/script_git/histoqc_output_20220615-202926/embed.png" alt="embed" style="zoom:25%;" />
+<img src="/figs/embed.png" alt="embed" style="zoom:25%;" />
 
 ##### 3. Patient partition plot
 
  'x' represents the patients were split into training set and '+' means the patients were partitioned into testing set. You can also find the patients information detail in the ***results_cohortfinder.tsv*** file.
 
-<img src="/Users/fanfan/Desktop/cohortfinder/script_git/histoqc_output_20220615-202926/embed_split.png" alt="embed_split" style="zoom:25%;" />
+<img src="/figs/embed_split.png" alt="embed_split" style="zoom:25%;" />
 
 ##### 4. The visual cluster results
 
-![groupingresults](/Users/fanfan/Desktop/groupingresults.png)
+![groupingresults](/figs/groupingresults.png)
 
