@@ -84,25 +84,25 @@ So it can generate the correct visual grouping results.
 
 # Outputs of CohortFinder
 
-##### 1. Result file and running log
+#### 1. Result file and running log
 
 The cohortfinder_result.tsv has two more columns than the histoqc tsv file. One is called 'groupid', representing which BE group the patient belongs to. One is called 'testind', where '1' represents the patients were partitioned into testing set, and '0' represents the patients were partitioned into training set.
 
 
 
-##### 2. Embeded plots
+#### 2. Embeded plots
 
 Each point represents a patient and different colors represent different batch effect groups
 
 <img src="/figs/embed.png" alt="embed" style="zoom:25%;" />
 
-##### 3. Patient partition plot
+#### 3. Patient partition plot
 
  'x' represents the patients were split into training set and '+' means the patients were partitioned into testing set. You can also find the patients information detail in the ***results_cohortfinder.tsv*** file.
 
 <img src="/figs/embed_split.png" alt="embed_split" style="zoom:25%;" />
 
-##### 4. The visual cluster results
+#### 4. The visual cluster results
 
 ![groupingresults](/figs/groupingresults.png)
 
