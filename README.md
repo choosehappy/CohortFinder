@@ -54,7 +54,7 @@ pip3 install -r requirements.txt
 
 # Quality Control Metrics Generation
 
-Please see  [Histoqc](https://github.com/choosehappy/HistoQC), this is an open-source quality control tool for digital pathology slides. We used the quality control metrics it generated.
+Please see  [Histoqc](https://github.com/choosehappy/HistoQC), this is an open-source quality control tool for digital pathology slides. We use the quality control metrics it generates.
 
 
 
@@ -86,7 +86,7 @@ So it can generate the correct visual grouping results.
 
 ##### 1. Result file and running log
 
-The cohortfinder_result.tsv has two more columns than the histoqc tsc file. One is called 'groupid' represents which BE group the patient belongs to. One is called 'testind', where '1' represents the patients were partitioned into testing set, and '0' represents the patients were partitioned into training set.
+The cohortfinder_result.tsv has two more columns than the histoqc tsv file. One is called 'groupid', representing which BE group the patient belongs to. One is called 'testind', where '1' represents the patients were partitioned into testing set, and '0' represents the patients were partitioned into training set.
 
 
 
