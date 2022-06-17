@@ -65,7 +65,7 @@ parser.add_argument('-r', '--randomseed', type=int, default=None)
 parser.add_argument('-o', '--outdir', type=str,
                     default="./histoqc_output_DATE_TIME")  # --- change to the same output directory as histoqc output so that UI can refind it without looking else where
 
-parser.add_argument('-n', '--nclusters', type=int, default=3, help="Number of clusters to attempt to divide data into before splitting into cohorts, default -1 of negative 1 makes best guess")
+parser.add_argument('-n', '--nclusters', type=int, default=-1, help="Number of clusters to attempt to divide data into before splitting into cohorts, default -1 of negative 1 makes best guess")
 parser.add_argument('-f','--histoqctsv', help="Input file",type=str)
 # -- add batch effect test
 args = parser.parse_args()
@@ -124,7 +124,6 @@ if args.sitecolumn:
         logging.warning(f"Site column {sitecol} *NOT* found")
 
 
-
 pidcol = None
 if args.patiendidcolumn and  args.patiendidcolumn in data.columns:
         pidcol = args.patiendidcolumn
@@ -140,7 +139,7 @@ else:
 
 if args.nclusters == -1:
     nslides = len(data)
-    nclusters = int(nslides // 3)  # target groups sizes of ~30 slides
+    nclusters = int(nslides // 6)  # every group has average three patients
     logging.info(f"Number of clusters implicitly computed to be:\t{nclusters}")    
 else:
     nclusters = args.nclusters
