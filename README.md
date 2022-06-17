@@ -79,7 +79,7 @@ The parameters CohortFinder used are as below:
 "mpp_x,mpp_y,michelson_contrast,rms_contrast,grayscale_brightness,chan1_brightness,chan2_brightness,chan3_brightness,chan1_brightness_YUV,chan2_brightness_YUV,chan3_brightness_YUV"
 ```
 
-This is the description of the metrics used to identify the batch effects in our previous [work]('https://pubmed.ncbi.nlm.nih.gov/33197281/'), as they quantify chromatic artifacts imparted during the staining and cutting of the tissue samples steps conducted at individual laboratories before central scanning. And you can also try other metrics if they have some influence during the scanning or the staining process for your slides.
+This is the description of the metrics used to identify the batch effects in our previous [work](https://pubmed.ncbi.nlm.nih.gov/33197281/), as they quantify chromatic artifacts imparted during the staining and cutting of the tissue samples steps conducted at individual laboratories before central scanning. And you can also try other metrics if they have some influence during the scanning or the staining process for your slides.
 
 | Quality control metric | Description                                                  |
 | ---------------------- | ------------------------------------------------------------ |
