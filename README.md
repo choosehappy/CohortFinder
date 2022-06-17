@@ -1,4 +1,7 @@
+
+
 # CohortFinder
+
 ---
 Intelligent data partitioning using quality control metrics
 
@@ -67,20 +70,83 @@ The parameters CohortFinder used are as below:
 
 
 
+### Parameter meaning:
+
+
+
+```
+-c: metrics calculated by HistoQC we used for batch effect group generation, the default metrics are:
+"mpp_x,mpp_y,michelson_contrast,rms_contrast,grayscale_brightness,chan1_brightness,chan2_brightness,chan3_brightness,chan1_brightness_YUV,chan2_brightness_YUV,chan3_brightness_YUV"
+```
+
+This is the description of the metrics used to identify the batch effects in our previous [work]('https://pubmed.ncbi.nlm.nih.gov/33197281/'), as they quantify chromatic artifacts imparted during the staining and cutting of the tissue samples steps conducted at individual laboratories before central scanning. And you can also try other metrics if they have some influence during the scanning or the staining process for your slides.
+
+| Quality control metric | Description                                                  |
+| ---------------------- | ------------------------------------------------------------ |
+| Mpp_x                  | Microns per pixel in the X dimension at base magnification   |
+| Mpp_y                  | Microns per pixel in the Y dimension at base magnification   |
+| Michelson_constrast    | Measurement of image contrast deﬁned by luminance difference over average luminance |
+| Rms_contrast           | Root mean square (RMS) contrast, deﬁned as the standard deviation of the pixel intensities across the pixels of interests |
+| Grayscale_brightness   | Mean pixel intensity of the image after converting the image to grayscale |
+| Chan1_brightness       | Mean pixel intensity of the red color channel of the image   |
+| Chan2_brightness       | Mean pixel intensity of the green color channel of the image |
+| Chan3_brightness       | Mean pixel intensity of the blue color channel of the image  |
+| Chan1_brightness_YUV   | Mean channel brightness of red color channel of image after converting to YUV color space |
+| Chan2_brightness_YUV   | Mean channel brightness of green color channel of image after converting to YUV color space |
+| Chan3_brightness_YUV   | Mean channel brightness of blue color channel of image after converting to YUV color space |
+
+```
+-l: the column contains the patient label information (0,1), this column needs to be manually added into the input data. The default value is None.
+```
+
+```
+-s: the column contains the site id information, this column needs to be manually added into the input data. The default value is None.
+```
+
+```
+-p: the column contains the patient id information, this column needs to be manually added into the input data. The default value is None.
+```
+
+```
+-t: the percentage of data you want to set as testing set for your machine learning model, default number = 0.2
+```
+
+```
+-b: statistical tests for variable confounding, at site level.
+```
+
+```
+-y: statistical tests for variable confounding, at label level
+```
+
+```
+-r: random seed
+```
+
+```
+-o: the output directory, the default value is histoqc_output_{DATE_TIME}
+```
+
+```
+-n: Number of clusters to attempt to divide data into. Positive interger represents the number of batch effect group you want to generate and '-1' will make each batch effect group has average certain number of patients, the default average number of patients is  6.
+```
+
+```
+-f: the input result.tsv file of HistoQC, please input the complete file path, for example: 'Histoqc-Master/histoqc_output_20220612-171953/results.tsv', so CohortFinder can generate the correct visual grouping results.
+```
+
 ### Run
 
-Go to the cohortfinder repository. Download or simply git-cloned, using the following typical command line for running the tool like:
+Go to the cohortfinder repository. Download or simply git-cloned, using the following typical command line for running the tool like. And you can also try the other function using the above parameters.
 
 ```python
- python3 cohortfinder_colormod_original.py -f "{the path of the result.tsv file of HistoQC}" -n 3
+ python3 cohortfinder_colormod_original.py -f "{the path of the result.tsv file of HistoQC}" -n -1
 ```
- For the histoqc result file, please input the complete file path, for example:
- ```python
-'Histoqc-Master/histoqc_output_20220612-171953/results.tsv'
- ```
-So it can generate the correct visual grouping results.
 
 
+### Use the resuls of CohortFinder
+
+Once you run the CohortFinder, you will get a cohortfinder result file called 'results_cohortfinder.tsv'. You will see two columns, one is called 'groupid', and the other is called 'testind', the testind == 1 represents the patients is partitioned into testing set and testind == 0 represents the patient is partitioned into the training set. You can simply use that patient partitioning results  to set up the training set and test/val set for your machine learning model!
 
 # Outputs of CohortFinder
 
