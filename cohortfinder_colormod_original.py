@@ -50,11 +50,8 @@ from sklearn.metrics import classification_report,confusion_matrix
 # +
 parser = argparse.ArgumentParser(description='Split histoqc tsv into training and testing')
 parser.add_argument('-c', '--cols', help="columnts to use for clustering, comma seperated", type=str,
-                    default="mpp_x,mpp_y,michelson_contrast,rms_contrast,"
-    "grayscale_brightness,grayscale_brightness_std,chan1_brightness,chan1_brightness_std,"
-    "chan2_brightness,chan2_brightness_std,chan3_brightness,chan3_brightness_std,"
-    "chan1_brightness_YUV,chan1_brightness_std_YUV,chan2_brightness_YUV,"
-    "chan2_brightness_std_YUV,chan3_brightness_YUV,chan3_brightness_std_YUV")
+                    default="mpp_x,mpp_y,michelson_contrast,rms_contrast,grayscale_brightness,chan1_brightness,chan2_brightness,"
+                            "chan3_brightness,chan1_brightness_YUV,chan2_brightness_YUV,chan3_brightness_YUV")
 parser.add_argument('-l', '--labelcolumn', help="column name associated with a 0,1 label", type=str, default=None)
 parser.add_argument('-s', '--sitecolumn', help="column name associated with site variable", type=str, default=None)
 parser.add_argument('-p', '--patiendidcolumn', help="column name associated with patient id, ensuring slides are grouped", type=str, default=None)
@@ -70,12 +67,12 @@ parser.add_argument('-f','--histoqctsv', help="Input file",type=str)
 # -- add batch effect test
 args = parser.parse_args()
 print(args)
-args = parser.parse_args(["-f/Volumes/EXTERNAL_USB/Cohortfinder/CF_tubule/Histoqc-Master/histoqc_output_20220612-171953/results.tsv","-n","6",
-                           "-b","-cmpp_x,mpp_y,michelson_contrast,rms_contrast,"
-    "grayscale_brightness,grayscale_brightness_std,chan1_brightness,chan1_brightness_std,"
-    "chan2_brightness,chan2_brightness_std,chan3_brightness,chan3_brightness_std,"
-    "chan1_brightness_YUV,chan1_brightness_std_YUV,chan2_brightness_YUV,"
-    "chan2_brightness_std_YUV,chan3_brightness_YUV,chan3_brightness_std_YUV"])
+# args = parser.parse_args(["-f/Volumes/EXTERNAL_USB/Cohortfinder/CF_tubule/Histoqc-Master/histoqc_output_20220612-171953/results.tsv","-n","6",
+#                            "-b","-cmpp_x,mpp_y,michelson_contrast,rms_contrast,"
+#     "grayscale_brightness,grayscale_brightness_std,chan1_brightness,chan1_brightness_std,"
+#     "chan2_brightness,chan2_brightness_std,chan3_brightness,chan3_brightness_std,"
+#     "chan1_brightness_YUV,chan1_brightness_std_YUV,chan2_brightness_YUV,"
+#     "chan2_brightness_std_YUV,chan3_brightness_YUV,chan3_brightness_std_YUV"])
 if (args.outdir == "./histoqc_output_DATE_TIME"):
     args.outdir = "./histoqc_output_" + time.strftime("%Y%m%d-%H%M%S")
 
