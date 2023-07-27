@@ -172,3 +172,17 @@ Each point represents a patient and different colors represent different batch e
 
 ![groupingresults](/figs/groupingresults.png)
 
+
+# Citation
+---
+Please use below to cite this paper if you find this repository useful or if you use the software shared here in your research.
+```
+  @misc{fan2023cohortfinder,
+      title={CohortFinder: an open-source tool for data-driven partitioning of biomedical image cohorts to yield robust machine learning models}, 
+      author={Fan Fan and Georgia Martinez and Thomas Desilvio and John Shin and Yijiang Chen and Bangchen Wang and Takaya Ozeki and Maxime W. Lafarge and Viktor H. Koelzer and Laura Barisoni and Anant Madabhushi and Satish E. Viswanath and Andrew Janowczyk},
+      year={2023},
+      eprint={2307.08673},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG}
+}
+```
