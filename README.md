@@ -176,6 +176,7 @@ Each point represents a patient and different colors represent different batch e
 # Citation
 ---
 Please use below to cite this paper if you find this repository useful or if you use the software shared here in your research.
+
 ```
   @misc{fan2023cohortfinder,
       title={CohortFinder: an open-source tool for data-driven partitioning of biomedical image cohorts to yield robust machine learning models}, 
@@ -186,3 +187,5 @@ Please use below to cite this paper if you find this repository useful or if you
       primaryClass={cs.LG}
 }
 ```
+
+[CohortFinder Paper link](https://arxiv.org/abs/2307.08673)
