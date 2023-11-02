@@ -19,8 +19,6 @@ import numpy as np
 import pandas as pd
 import umap.umap_ as umap
 from random import shuffle
-from matplotlib.colors import ListedColormap, LinearSegmentedColormap
-
 
 from scipy.stats import ttest_ind
 from sklearn import preprocessing
@@ -30,7 +28,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report,confusion_matrix
 
-def batcheffecttester(col,name):
+def batcheffecttester(data, columnName, datasub, name):
+    col = data[columnName]
     logging.info(f"Starting  Batch Effect {name} test...") #--- write to file 
     df_true=pd.DataFrame(index=set([str(s) for s in col])) #convert sites to strings and then use set to get unique list
     df_rand=pd.DataFrame(index=set([str(s) for s in col])) #convert sites to strings and then use set to get unique list
@@ -62,21 +61,21 @@ def batcheffecttester(col,name):
     logging.info(f"{name} \t num slides \t p-value  \t sig-ind") #--- write to file 
     for key in df_true.index.sort_values():
         ttestres=ttest_ind(df_true.loc[key],df_rand.loc[key], nan_policy='omit')[1]
-        logging.info(f"{key}\t{sum(data[sitecol]==key)}\t{ttestres}\t{'***' if ttestres<.05 else ''}")
+        logging.info(f"{key}\t{sum(col==key)}\t{ttestres}\t{'***' if ttestres<.05 else ''}") # line assumes sitecol exists 
 
     logging.info(f"--------- Batch Effect {name} feature importance results -------") 
     logging.info(f"\t Average+Variance \t Feature name") 
     meanfeatimport=np.mean(featimport['true'],axis=0)
     varfeatimport=np.var(featimport['true'],axis=0)
     for fi in np.argsort(meanfeatimport)[::-1]:
-        logging.info(f"\t{meanfeatimport[fi]:.2f} ({varfeatimport[fi]:.2f}) \t\t{coluse[fi]}")     
+        logging.info(f"\t{meanfeatimport[fi]:.2f} ({varfeatimport[fi]:.2f}) \t\t{datasub.columns[fi]}")     
 
     logging.info(f"------------------------------------------------") #--- write to file 
 
 
 def runCohortFinder(args):
     """
-    Runs the CohortFinder algorithm on the input data.
+    Using the output tsv file from HistoQC, produce a new tsv file containing four new columns: embed_x, embed_y, groupid, testind
 
     Args:
         args: A namespace (like that returned by argparse) containing the arguments for CohortFinder.
@@ -84,6 +83,7 @@ def runCohortFinder(args):
         output: A pandas dataframe containing the input data and the cohortfinder results.
         preds: A list of integers representing the cluster assignments.
     """
+
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
     file = logging.FileHandler(filename=f"{args.outdir}/cohortfinder.log")
@@ -150,9 +150,9 @@ def runCohortFinder(args):
 
     # --- add patch embeddings from quick annotator
     if args.batcheffectsitetest and sitecol:
-        batcheffecttester(data[sitecol],'Site')
+        batcheffecttester(data, sitecol, datasub, 'Site')
     if args.batcheffectlabeltest and labelcol:
-        batcheffecttester(data[labelcol],'Label')
+        batcheffecttester(data, labelcol, datasub, 'Label')
 
 
     # --- back to cohort finder
@@ -305,42 +305,42 @@ if __name__ == '__main__':
     
 
     # ------------------------- MAKE GROUP PLOTS ------------------------- #
-    # basedir = os.path.dirname(args.histoqctsv)
-    # ngroupsof5 = 3
-    # for gid in np.unique(preds):
-    #     fig, axs = plt.subplots(ngroupsof5, 5, figsize=(20, 20))
-    #     axs = list(axs.flatten())
+    basedir = os.path.dirname(args.histoqctsv)
+    ngroupsof5 = 3
+    for gid in np.unique(preds):
+        fig, axs = plt.subplots(ngroupsof5, 5, figsize=(20, 20))
+        axs = list(axs.flatten())
 
-    #     fnamessub = list(output["#dataset:filename"][gid == preds])
-    #     fnamessub = random.sample(fnamessub, ngroupsof5 * 5) if len(fnamessub) > ngroupsof5 * 5 else fnamessub
+        fnamessub = list(output["#dataset:filename"][gid == preds])
+        fnamessub = random.sample(fnamessub, ngroupsof5 * 5) if len(fnamessub) > ngroupsof5 * 5 else fnamessub
 
-    #     for fname in fnamessub:
-    #         print(fname)
-    #         fullfname = glob.glob(f"{basedir}/**/{fname}*thumb*small*")
-    #         # print(args.histoqctsv)
-    #         print(f"This is the filename name: {basedir}")
-    #         io = cv2.cvtColor(cv2.imread(fullfname[0]), cv2.COLOR_BGR2RGB)
-    #         axs.pop().imshow(io)
+        for fname in fnamessub:
+            print(fname)
+            fullfname = glob.glob(f"{basedir}/**/{fname}*thumb*small*")
+            # print(args.histoqctsv)
+            print(f"This is the filename name: {basedir}")
+            io = cv2.cvtColor(cv2.imread(fullfname[0]), cv2.COLOR_BGR2RGB)
+            axs.pop().imshow(io)
 
-    #     plt.savefig(f'{args.outdir}/group_{gid}.png')
-    #     plt.close(fig)
+        plt.savefig(f'{args.outdir}/group_{gid}.png')
+        plt.close(fig)
 
 
     # ------------------------- MAKE OVERVIEW PLOT ------------------------- #
-    # basedir = os.path.dirname(args.histoqctsv)
+    basedir = os.path.dirname(args.histoqctsv)
 
-    # fig, axs = plt.subplots(int(np.ceil(len(np.unique(preds)) / 5)), 5, figsize=(20, 20))
-    # axs = list(axs.flatten())
-    # for gid in np.unique(preds):
-    #     fnamessub = list(output["#dataset:filename"][gid == preds])
-    #     fname = random.sample(fnamessub, 1)[0]
+    fig, axs = plt.subplots(int(np.ceil(len(np.unique(preds)) / 5)), 5, figsize=(20, 20))
+    axs = list(axs.flatten())
+    for gid in np.unique(preds):
+        fnamessub = list(output["#dataset:filename"][gid == preds])
+        fname = random.sample(fnamessub, 1)[0]
 
-    #     fullfname = glob.glob(f"{basedir}/**/{fname}*thumb*small*")
-    #     io = cv2.cvtColor(cv2.imread(fullfname[0]), cv2.COLOR_BGR2RGB)
-    #     axs.pop().imshow(io)
+        fullfname = glob.glob(f"{basedir}/**/{fname}*thumb*small*")
+        io = cv2.cvtColor(cv2.imread(fullfname[0]), cv2.COLOR_BGR2RGB)
+        axs.pop().imshow(io)
 
-    # plt.savefig(f'{args.outdir}/allgroups.png')
-    # plt.close(fig)
+    plt.savefig(f'{args.outdir}/allgroups.png')
+    plt.close(fig)
 
     logging.shutdown()
 
