@@ -308,42 +308,42 @@ def runCohortFinder(args):
 
 
     # ------------------------- MAKE GROUP PLOTS ------------------------- #
-    # basedir = os.path.dirname(hqc_results_tsv)
-    # ngroupsof5 = 3
-    # for gid in np.unique(preds):
-    #     fig, axs = plt.subplots(ngroupsof5, 5, figsize=(20, 20))
-    #     axs = list(axs.flatten())
+    basedir = os.path.dirname(hqc_results_tsv_path)
+    ngroupsof5 = 3
+    for gid in np.unique(preds):
+        fig, axs = plt.subplots(ngroupsof5, 5, figsize=(20, 20))
+        axs = list(axs.flatten())
 
-    #     fnamessub = list(output["#dataset:filename"][gid == preds])
-    #     fnamessub = random.sample(fnamessub, ngroupsof5 * 5) if len(fnamessub) > ngroupsof5 * 5 else fnamessub
+        fnamessub = list(output["#dataset:filename"][gid == preds])
+        fnamessub = random.sample(fnamessub, ngroupsof5 * 5) if len(fnamessub) > ngroupsof5 * 5 else fnamessub
 
-    #     for fname in fnamessub:
-    #         print(fname)
-    #         fullfname = glob.glob(f"{basedir}/**/{fname}*thumb*small*")
-    #         # print(hqc_results_tsv)
-    #         print(f"This is the filename name: {basedir}")
-    #         io = cv2.cvtColor(cv2.imread(fullfname[0]), cv2.COLOR_BGR2RGB)
-    #         axs.pop().imshow(io)
+        for fname in fnamessub:
+            print(fname)
+            fullfname = glob.glob(f"{basedir}/**/{fname}*thumb*small*")
+            # print(hqc_results_tsv)
+            print(f"This is the filename name: {basedir}")
+            io = cv2.cvtColor(cv2.imread(fullfname[0]), cv2.COLOR_BGR2RGB)
+            axs.pop().imshow(io)
 
-    #     plt.savefig(os.path.join(plots_outdir, f'group_{gid}.png'))
-    #     plt.close(fig)
+        plt.savefig(os.path.join(plots_outdir, f'group_{gid}.png'))
+        plt.close(fig)
 
 
     # ------------------------- MAKE OVERVIEW PLOT ------------------------- #
-    # basedir = os.path.dirname(hqc_results_tsv)
+    basedir = os.path.dirname(hqc_results_tsv_path)
 
-    # fig, axs = plt.subplots(int(np.ceil(len(np.unique(preds)) / 5)), 5, figsize=(20, 20))
-    # axs = list(axs.flatten())
-    # for gid in np.unique(preds):
-    #     fnamessub = list(output["#dataset:filename"][gid == preds])
-    #     fname = random.sample(fnamessub, 1)[0]
+    fig, axs = plt.subplots(int(np.ceil(len(np.unique(preds)) / 5)), 5, figsize=(20, 20))
+    axs = list(axs.flatten())
+    for gid in np.unique(preds):
+        fnamessub = list(output["#dataset:filename"][gid == preds])
+        fname = random.sample(fnamessub, 1)[0]
 
-    #     fullfname = glob.glob(f"{basedir}/**/{fname}*thumb*small*")
-    #     io = cv2.cvtColor(cv2.imread(fullfname[0]), cv2.COLOR_BGR2RGB)
-    #     axs.pop().imshow(io)
+        fullfname = glob.glob(f"{basedir}/**/{fname}*thumb*small*")
+        io = cv2.cvtColor(cv2.imread(fullfname[0]), cv2.COLOR_BGR2RGB)
+        axs.pop().imshow(io)
 
-    # plt.savefig(os.path.join(plots_outdir, f'allgroups.png'))
-    # plt.close(fig)
+    plt.savefig(os.path.join(plots_outdir, f'allgroups.png'))
+    plt.close(fig)
 
 
     return output, preds
