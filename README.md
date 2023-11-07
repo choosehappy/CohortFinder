@@ -65,8 +65,35 @@ Please see  [Histoqc](https://github.com/choosehappy/HistoQC), this is an open-s
 
 ---
 The parameters CohortFinder used are as below:
+```bash
+python3 cohortfinder_colormod_original.py --help
+```
 
-![Screen Shot 2022-06-15 at 10.15.02 PM](/figs/config.png)
+```
+usage: cohortfinder_colormod_original.py [-h] [-c COLS] [-l LABELCOLUMN] [-s SITECOLUMN] [-p PATIENDIDCOLUMN] [-t TESTPERCENT] [-b] [-y] [-r RANDOMSEED] [-o OUTDIR] [-n NCLUSTERS] histoqcdir
+
+Split histoqc tsv into training and testing
+
+positional arguments:
+  histoqcdir            The directory containing the output of HistoQC. This argument is required.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c COLS, --cols COLS  columnts to use for clustering, comma seperated
+  -l LABELCOLUMN, --labelcolumn LABELCOLUMN
+                        column name associated with a 0,1 label
+  -s SITECOLUMN, --sitecolumn SITECOLUMN
+                        column name associated with site variable
+  -p PATIENDIDCOLUMN, --patiendidcolumn PATIENDIDCOLUMN
+                        column name associated with patient id, ensuring slides are grouped
+  -t TESTPERCENT, --testpercent TESTPERCENT
+  -b, --batcheffectsitetest
+  -y, --batcheffectlabeltest
+  -r RANDOMSEED, --randomseed RANDOMSEED
+  -o OUTDIR, --outdir OUTDIR
+  -n NCLUSTERS, --nclusters NCLUSTERS
+                        Number of clusters to attempt to divide data into before splitting into cohorts, default -1 of negative 1 makes best guess
+```
 
 
 
