@@ -136,8 +136,9 @@ This is the description of the metrics used to identify the batch effects in our
 ```
 
 ```
-histoqcdir: the directory containing histoqc's output. Read about --outdir in [HistoQC's basic usage instructions](https://github.com/choosehappy/HistoQC#basic-usage)
+histoqcdir: the directory containing histoqc's output.
 ```
+histoqcdir should be the same directory passed to the "--output" flag in histoqc. See "--output" in [HistoQC's basic usage section](https://github.com/choosehappy/HistoQC#basic-usage)
 
 ### Run
 
