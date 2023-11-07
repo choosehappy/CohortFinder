@@ -77,6 +77,24 @@ def runCohortFinder(args):
     """
     Using the output tsv file from HistoQC, produce a new tsv file containing four new columns: embed_x, embed_y, groupid, testind
 
+    args.outputdir is assumed to be the output directory of HistoQC. The output of this function will be written to args.outputdir/cohortFinder_output
+
+    outputdir/
+        ... (histoqc output files)
+        cohortfinder_output_DATE_TIME/
+            results_cohortfinder.tsv
+            cohortfinder.log
+            plots/
+                embed.png
+                embed_split.png
+                embed_by_label.png (conditional)
+                embed_by_site.png (conditional)
+                group_0.png
+                ...
+                group_N.png
+                allgroups.png
+
+
     Args:
         args: A namespace (like that returned by argparse) containing the arguments for CohortFinder.
     Returns:
@@ -84,12 +102,30 @@ def runCohortFinder(args):
         preds: A list of integers representing the cluster assignments.
     """
 
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-    file = logging.FileHandler(filename=f"{args.outdir}/cohortfinder.log")
+    # --- set up output file structure
+    hqc_results_tsv_path = os.path.join(args.histoqcdir, "results.tsv")
+
+    if args.outdir is None: # default behavior is to write to the same directory as the histoqc output
+        args.outdir = args.histoqcdir
+
+    cf_outdir = os.path.join(args.outdir, "cohortfinder_output_" + time.strftime("%Y%m%d-%H%M%S"))
+
+    os.mkdir(cf_outdir)
+    results_outdir = os.path.join(cf_outdir, "results_cohortfinder.tsv")
+    log_outdir = os.path.join(cf_outdir, "cohortfinder.log")
+    plots_outdir = os.path.join(cf_outdir, "plots")
+    os.mkdir(plots_outdir)
+    
+
+
+    # --- setup logging
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    file = logging.FileHandler(filename=log_outdir)
     file.setLevel(logging.INFO)
     file.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
     logging.getLogger('').addHandler(file)
+
 
     # --- setup seed for reproducability
     seed = args.randomseed if (args.randomseed) else random.randrange(
@@ -100,7 +136,7 @@ def runCohortFinder(args):
 
     coluse = args.cols.split(",")
 
-    data = pd.read_csv(args.histoqctsv, sep='\t', header=5)
+    data = pd.read_csv(hqc_results_tsv_path, sep='\t', header=5)
     logging.info(data)
     logging.info(f'Number of slides:\t{len(data)}')
 
@@ -167,7 +203,7 @@ def runCohortFinder(args):
 
     plt.figure(figsize=(20, 20))
     plt.scatter(embedding[:, 0], embedding[:, 1], c=preds, cmap=cmap, linewidths=5)
-    plt.savefig(args.outdir + '/embed.png')
+    plt.savefig(os.path.join(plots_outdir, 'embed.png'))
     logging.info(Counter(preds))
 
 
@@ -189,7 +225,7 @@ def runCohortFinder(args):
         
         plt.figure(figsize=(20, 20))
         plt.scatter(embedding[:, 0], embedding[:, 1], c=labelids, cmap=cmap)
-        plt.savefig(args.outdir + '/embed_by_label.png')
+        plt.savefig(os.path.join(plots_outdir, 'embed_by_label.png'))
         logging.info(Counter(data[labelcol]))
         
         
@@ -205,7 +241,7 @@ def runCohortFinder(args):
         
         plt.figure(figsize=(20, 20))
         plt.scatter(embedding[:, 0], embedding[:, 1], c=siteids, cmap=cmap)
-        plt.savefig(args.outdir + '/embed_by_site.png')
+        plt.savefig(os.path.join(plots_outdir, 'embed_by_site.png'))
         logging.info(Counter(data[sitecol]))
         
 
@@ -251,12 +287,12 @@ def runCohortFinder(args):
     testind = output["testind"] == True
     plt.scatter(embedding[testind, 0], embedding[testind, 1], c=preds[testind], cmap=cmap, marker='+')
     plt.scatter(embedding[~testind, 0], embedding[~testind, 1], c=preds[~testind], cmap=cmap, marker='x')
-    plt.savefig(args.outdir + '/embed_split.png')
+    plt.savefig(os.path.join(plots_outdir, 'embed_split.png'))
 
 
-    # --- save output to new tsv file
-    with open(f"{args.outdir}/results_cohortfinder.tsv", 'w') as cf_out:
-        with open(args.histoqctsv, 'r') as f:
+    # ------------------------- WRITE TSV OUTPUT ------------------------- #
+    with open(results_outdir, 'w') as cf_out:
+        with open(hqc_results_tsv_path, 'r') as f:
             for line in f:
                 if line.startswith("#"):
                     cf_out.write(line.replace("dataset:filename", "prevcols:filename"))
@@ -269,7 +305,47 @@ def runCohortFinder(args):
         colorlist = ['#%02x%02x%02x' % (x[0], x[1], x[2]) for x in (np.asarray(cmap.colors) * 255).astype(np.uint8)]
         cf_out.write(f"#colorlist:{','.join(list(colorlist))}\n")
         output.to_csv(cf_out, sep="\t", line_terminator='\n', index=False)
-    
+
+
+    # ------------------------- MAKE GROUP PLOTS ------------------------- #
+    # basedir = os.path.dirname(hqc_results_tsv)
+    # ngroupsof5 = 3
+    # for gid in np.unique(preds):
+    #     fig, axs = plt.subplots(ngroupsof5, 5, figsize=(20, 20))
+    #     axs = list(axs.flatten())
+
+    #     fnamessub = list(output["#dataset:filename"][gid == preds])
+    #     fnamessub = random.sample(fnamessub, ngroupsof5 * 5) if len(fnamessub) > ngroupsof5 * 5 else fnamessub
+
+    #     for fname in fnamessub:
+    #         print(fname)
+    #         fullfname = glob.glob(f"{basedir}/**/{fname}*thumb*small*")
+    #         # print(hqc_results_tsv)
+    #         print(f"This is the filename name: {basedir}")
+    #         io = cv2.cvtColor(cv2.imread(fullfname[0]), cv2.COLOR_BGR2RGB)
+    #         axs.pop().imshow(io)
+
+    #     plt.savefig(os.path.join(plots_outdir, f'group_{gid}.png'))
+    #     plt.close(fig)
+
+
+    # ------------------------- MAKE OVERVIEW PLOT ------------------------- #
+    # basedir = os.path.dirname(hqc_results_tsv)
+
+    # fig, axs = plt.subplots(int(np.ceil(len(np.unique(preds)) / 5)), 5, figsize=(20, 20))
+    # axs = list(axs.flatten())
+    # for gid in np.unique(preds):
+    #     fnamessub = list(output["#dataset:filename"][gid == preds])
+    #     fname = random.sample(fnamessub, 1)[0]
+
+    #     fullfname = glob.glob(f"{basedir}/**/{fname}*thumb*small*")
+    #     io = cv2.cvtColor(cv2.imread(fullfname[0]), cv2.COLOR_BGR2RGB)
+    #     axs.pop().imshow(io)
+
+    # plt.savefig(os.path.join(plots_outdir, f'allgroups.png'))
+    # plt.close(fig)
+
+
     return output, preds
 
 
@@ -286,61 +362,17 @@ if __name__ == '__main__':
     parser.add_argument('-y', '--batcheffectlabeltest', action="store_true")
     parser.add_argument('-r', '--randomseed', type=int, default=None)
     parser.add_argument('-o', '--outdir', type=str,
-                        default="./histoqc_output_DATE_TIME")  # --- change to the same output directory as histoqc output so that UI can refind it without looking else where
+                        default=None)  # --- change to the same output directory as histoqc output so that UI can refind it without looking else where
 
     parser.add_argument('-n', '--nclusters', type=int, default=-1, help="Number of clusters to attempt to divide data into before splitting into cohorts, default -1 of negative 1 makes best guess")
-    parser.add_argument('-f','--histoqctsv', help="Input file",type=str)
+    parser.add_argument('histoqcdir', help="The directory containing the output of HistoQC", type=str)
     # -- add batch effect test
     args = parser.parse_args()
     print(args)
 
 
-    if (args.outdir == "./histoqc_output_DATE_TIME"):
-        args.outdir = "./histoqc_output_" + time.strftime("%Y%m%d-%H%M%S")
-
-    os.makedirs(args.outdir, exist_ok=True)
-
     # ------------------------- RUN COHORTFINDER ------------------------- #
     output, preds = runCohortFinder(args)
-    
-
-    # ------------------------- MAKE GROUP PLOTS ------------------------- #
-    basedir = os.path.dirname(args.histoqctsv)
-    ngroupsof5 = 3
-    for gid in np.unique(preds):
-        fig, axs = plt.subplots(ngroupsof5, 5, figsize=(20, 20))
-        axs = list(axs.flatten())
-
-        fnamessub = list(output["#dataset:filename"][gid == preds])
-        fnamessub = random.sample(fnamessub, ngroupsof5 * 5) if len(fnamessub) > ngroupsof5 * 5 else fnamessub
-
-        for fname in fnamessub:
-            print(fname)
-            fullfname = glob.glob(f"{basedir}/**/{fname}*thumb*small*")
-            # print(args.histoqctsv)
-            print(f"This is the filename name: {basedir}")
-            io = cv2.cvtColor(cv2.imread(fullfname[0]), cv2.COLOR_BGR2RGB)
-            axs.pop().imshow(io)
-
-        plt.savefig(f'{args.outdir}/group_{gid}.png')
-        plt.close(fig)
-
-
-    # ------------------------- MAKE OVERVIEW PLOT ------------------------- #
-    basedir = os.path.dirname(args.histoqctsv)
-
-    fig, axs = plt.subplots(int(np.ceil(len(np.unique(preds)) / 5)), 5, figsize=(20, 20))
-    axs = list(axs.flatten())
-    for gid in np.unique(preds):
-        fnamessub = list(output["#dataset:filename"][gid == preds])
-        fname = random.sample(fnamessub, 1)[0]
-
-        fullfname = glob.glob(f"{basedir}/**/{fname}*thumb*small*")
-        io = cv2.cvtColor(cv2.imread(fullfname[0]), cv2.COLOR_BGR2RGB)
-        axs.pop().imshow(io)
-
-    plt.savefig(f'{args.outdir}/allgroups.png')
-    plt.close(fig)
 
     logging.shutdown()
 

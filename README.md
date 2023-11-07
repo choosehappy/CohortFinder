@@ -124,7 +124,7 @@ This is the description of the metrics used to identify the batch effects in our
 ```
 
 ```
--o: the output directory, the default value is histoqc_output_{DATE_TIME}
+-o: the output directory. The default value of None causes cohortfinder to use histoqcdir as the output directory.
 ```
 
 ```
@@ -133,6 +133,10 @@ This is the description of the metrics used to identify the batch effects in our
 
 ```
 -f: the input result.tsv file of HistoQC, please input the complete file path, for example: 'Histoqc-Master/histoqc_output_20220612-171953/results.tsv', so CohortFinder can generate the correct visual grouping results.
+```
+
+```
+histoqcdir: the directory containing histoqc's output. Read about --outdir in [HistoQC's basic usage instructions](https://github.com/choosehappy/HistoQC#basic-usage)
 ```
 
 ### Run
