@@ -79,7 +79,7 @@ def runCohortFinder(args):
 
     args.outputdir is assumed to be the output directory of HistoQC. The output of this function will be written to args.outputdir/cohortFinder_output
 
-    outputdir/
+    outputdir/ (default is histoqc output directory)
         ... (histoqc output files)
         cohortfinder_output_DATE_TIME/
             results_cohortfinder.tsv
@@ -365,7 +365,7 @@ if __name__ == '__main__':
                         default=None)  # --- change to the same output directory as histoqc output so that UI can refind it without looking else where
 
     parser.add_argument('-n', '--nclusters', type=int, default=-1, help="Number of clusters to attempt to divide data into before splitting into cohorts, default -1 of negative 1 makes best guess")
-    parser.add_argument('histoqcdir', help="The directory containing the output of HistoQC", type=str)
+    parser.add_argument('histoqcdir', help="The directory containing the output of HistoQC. This argument is required.", type=str)
     # -- add batch effect test
     args = parser.parse_args()
     print(args)

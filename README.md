@@ -132,33 +132,51 @@ This is the description of the metrics used to identify the batch effects in our
 ```
 
 ```
--f: the input result.tsv file of HistoQC, please input the complete file path, for example: 'Histoqc-Master/histoqc_output_20220612-171953/results.tsv', so CohortFinder can generate the correct visual grouping results.
-```
-
-```
 histoqcdir: the directory containing histoqc's output.
 ```
-histoqcdir should be the same directory passed to the "--output" flag in histoqc. See "--output" in [HistoQC's basic usage section](https://github.com/choosehappy/HistoQC#basic-usage)
+histoqcdir should be the same directory that was passed to the "--output" flag in histoqc. See "--output" in [HistoQC's basic usage section](https://github.com/choosehappy/HistoQC#basic-usage)
 
 ### Run
 
 Go to the cohortfinder repository. Download or simply git-cloned, using the following typical command line for running the tool like. And you can also try the other function using the above parameters.
 
 ```python
- python3 cohortfinder_colormod_original.py -f "{the path of the result.tsv file of HistoQC}" -n -1
+ python3 cohortfinder_colormod_original.py -n 1 "{the HistoQC output path}"
 ```
 
 
-### Use the resuls of CohortFinder
+### Use the results of CohortFinder
 
 Once you run the CohortFinder, you will get a cohortfinder result file called 'results_cohortfinder.tsv'. You will see two columns, one is called 'groupid', and the other is called 'testind', the testind == 1 represents the patients is partitioned into testing set and testind == 0 represents the patient is partitioned into the training set. You can simply use that patient partitioning results  to set up the training set and test/val set for your machine learning model!
+
+CohortFinder produces the following ouput file structure:
+```
+outputdir/ (default is histoqc output directory)
+    ... (histoqc output, including results.tsv)
+    cohortfinder_output_DATE_TIME/
+        results_cohortfinder.tsv
+        cohortfinder.log
+        plots/
+            embed.png
+            embed_split.png
+            embed_by_label.png (conditional)
+            embed_by_site.png (conditional)
+            group_0.png
+            ...
+            group_N.png
+            allgroups.png
+```
+
 
 # Outputs of CohortFinder
 
 #### 1. Result file and running log
 
-The cohortfinder_result.tsv has two more columns than the histoqc tsv file. One is called 'groupid', representing which BE group the patient belongs to. One is called 'testind', where '1' represents the patients were partitioned into testing set, and '0' represents the patients were partitioned into training set.
-
+The results_cohortfinder.tsv has four more columns than the histoqc results.tsv file:
+1. **groupid**: the batch effect group assigned to the patient by cohortfinder.
+2. **testind**: the testing/training set assignment, where "1" patients were assigned to the testing set and "0" patients were assigned to the training set.
+3. **embed_x**: the UMAP embedding x coordinates.
+4. **embed_y**: the UMAP embedding y coordinates.
 
 
 #### 2. Embeded plots
