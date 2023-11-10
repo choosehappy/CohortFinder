@@ -198,12 +198,14 @@ def runCohortFinder(args):
     preds = clustered.labels_
 
 
-    # --- setup colormap
-    cmap=matplotlib.colors.ListedColormap( matplotlib.cm.get_cmap('Set1').colors+ matplotlib.cm.get_cmap('Set2').colors+  matplotlib.cm.get_cmap('Set3').colors  )
+    # --- save embedding plot
+    if not args.disable_save:
+        cmap=matplotlib.colors.ListedColormap( matplotlib.cm.get_cmap('Set1').colors+ matplotlib.cm.get_cmap('Set2').colors+  matplotlib.cm.get_cmap('Set3').colors  )
 
-    plt.figure(figsize=(20, 20))
-    plt.scatter(embedding[:, 0], embedding[:, 1], c=preds, cmap=cmap, linewidths=5)
-    plt.savefig(os.path.join(plots_outdir, 'embed.png'))
+        plt.figure(figsize=(20, 20))
+        plt.scatter(embedding[:, 0], embedding[:, 1], c=preds, cmap=cmap, linewidths=5)
+        plt.savefig(os.path.join(plots_outdir, 'embed.png'))
+    
     logging.info(Counter(preds))
 
 
@@ -216,16 +218,18 @@ def runCohortFinder(args):
         # --- add label information to the dataframe
         output["label"] = data[labelcol]
 
+        # --- save label embedding plot
+        if not args.disable_save:
+            # --- convert labels to integers starting from 0 for plotting
+            labellookup={ v:i for i,v in enumerate(set(data[labelcol]))}
+            labelids = [labellookup[s] for s in data[labelcol]]
+            nlabels = len(labellookup)
+            
+            
+            plt.figure(figsize=(20, 20))
+            plt.scatter(embedding[:, 0], embedding[:, 1], c=labelids, cmap=cmap)
+            plt.savefig(os.path.join(plots_outdir, 'embed_by_label.png'))
 
-        # --- convert labels to integers starting from 0 for plotting
-        labellookup={ v:i for i,v in enumerate(set(data[labelcol]))}
-        labelids = [labellookup[s] for s in data[labelcol]]
-        nlabels = len(labellookup)
-        
-        
-        plt.figure(figsize=(20, 20))
-        plt.scatter(embedding[:, 0], embedding[:, 1], c=labelids, cmap=cmap)
-        plt.savefig(os.path.join(plots_outdir, 'embed_by_label.png'))
         logging.info(Counter(data[labelcol]))
         
         
@@ -233,15 +237,17 @@ def runCohortFinder(args):
         # --- add site information to the dataframe
         output["site"] = data[sitecol]
 
+        # --- save site embedding plot
+        if not args.disable_save:
+            # --- convert sites to integers starting from 0 for plotting
+            sitelookup={ v:i for i,v in enumerate(set(data[sitecol]))}
+            siteids = [sitelookup[s] for s in data[sitecol]]
+            nsites = len(sitelookup)
+            
+            plt.figure(figsize=(20, 20))
+            plt.scatter(embedding[:, 0], embedding[:, 1], c=siteids, cmap=cmap)
+            plt.savefig(os.path.join(plots_outdir, 'embed_by_site.png'))
 
-        # --- convert sites to integers starting from 0 for plotting
-        sitelookup={ v:i for i,v in enumerate(set(data[sitecol]))}
-        siteids = [sitelookup[s] for s in data[sitecol]]
-        nsites = len(sitelookup)
-        
-        plt.figure(figsize=(20, 20))
-        plt.scatter(embedding[:, 0], embedding[:, 1], c=siteids, cmap=cmap)
-        plt.savefig(os.path.join(plots_outdir, 'embed_by_site.png'))
         logging.info(Counter(data[sitecol]))
         
 
@@ -281,69 +287,70 @@ def runCohortFinder(args):
     logging.info(f'Num in testing set: {np.sum(output["testind"]==1)}')
     logging.info(f'Percent in testing set: {np.mean(output["testind"])}')
 
-
-    # --- plot training testing split. + is test, x is train
-    plt.figure(figsize=(20, 20))
-    testind = output["testind"] == True
-    plt.scatter(embedding[testind, 0], embedding[testind, 1], c=preds[testind], cmap=cmap, marker='+')
-    plt.scatter(embedding[~testind, 0], embedding[~testind, 1], c=preds[~testind], cmap=cmap, marker='x')
-    plt.savefig(os.path.join(plots_outdir, 'embed_split.png'))
-
-
-    # ------------------------- WRITE TSV OUTPUT ------------------------- #
-    with open(results_outdir, 'w') as cf_out:
-        with open(hqc_results_tsv_path, 'r') as f:
-            for line in f:
-                if line.startswith("#"):
-                    cf_out.write(line.replace("dataset:filename", "prevcols:filename"))
-                else:
-                    break
-        cf_out.write(f"#{args}\n")
-        cf_out.write(f"#sitecol:{sitecol}\n")
-        cf_out.write(f"#labelcol:{labelcol}\n")
-
-        colorlist = ['#%02x%02x%02x' % (x[0], x[1], x[2]) for x in (np.asarray(cmap.colors) * 255).astype(np.uint8)]
-        cf_out.write(f"#colorlist:{','.join(list(colorlist))}\n")
-        output.to_csv(cf_out, sep="\t", line_terminator='\n', index=False)
+    
+    if not args.disable_save:
+        # --- plot training testing split. + is test, x is train
+        plt.figure(figsize=(20, 20))
+        testind = output["testind"] == True
+        plt.scatter(embedding[testind, 0], embedding[testind, 1], c=preds[testind], cmap=cmap, marker='+')
+        plt.scatter(embedding[~testind, 0], embedding[~testind, 1], c=preds[~testind], cmap=cmap, marker='x')
+        plt.savefig(os.path.join(plots_outdir, 'embed_split.png'))
 
 
-    # ------------------------- MAKE GROUP PLOTS ------------------------- #
-    basedir = os.path.dirname(hqc_results_tsv_path)
-    ngroupsof5 = 3
-    for gid in np.unique(preds):
-        fig, axs = plt.subplots(ngroupsof5, 5, figsize=(20, 20))
+        # ------------------------- WRITE TSV OUTPUT ------------------------- #
+        with open(results_outdir, 'w') as cf_out:
+            with open(hqc_results_tsv_path, 'r') as f:
+                for line in f:
+                    if line.startswith("#"):
+                        cf_out.write(line.replace("dataset:filename", "prevcols:filename"))
+                    else:
+                        break
+            cf_out.write(f"#{args}\n")
+            cf_out.write(f"#sitecol:{sitecol}\n")
+            cf_out.write(f"#labelcol:{labelcol}\n")
+
+            colorlist = ['#%02x%02x%02x' % (x[0], x[1], x[2]) for x in (np.asarray(cmap.colors) * 255).astype(np.uint8)]
+            cf_out.write(f"#colorlist:{','.join(list(colorlist))}\n")
+            output.to_csv(cf_out, sep="\t", line_terminator='\n', index=False)
+
+
+        # ------------------------- MAKE GROUP PLOTS ------------------------- #
+        basedir = os.path.dirname(hqc_results_tsv_path)
+        ngroupsof5 = 3
+        for gid in np.unique(preds):
+            fig, axs = plt.subplots(ngroupsof5, 5, figsize=(20, 20))
+            axs = list(axs.flatten())
+
+            fnamessub = list(output["#dataset:filename"][gid == preds])
+            fnamessub = random.sample(fnamessub, ngroupsof5 * 5) if len(fnamessub) > ngroupsof5 * 5 else fnamessub
+
+            for fname in fnamessub:
+                print(fname)
+                fullfname = glob.glob(f"{basedir}/**/{fname}*thumb*small*")
+                # print(hqc_results_tsv)
+                print(f"This is the filename name: {basedir}")
+                io = cv2.cvtColor(cv2.imread(fullfname[0]), cv2.COLOR_BGR2RGB)
+                axs.pop().imshow(io)
+
+            plt.savefig(os.path.join(plots_outdir, f'group_{gid}.png'))
+            plt.close(fig)
+
+
+        # ------------------------- MAKE OVERVIEW PLOT ------------------------- #
+        basedir = os.path.dirname(hqc_results_tsv_path)
+
+        fig, axs = plt.subplots(int(np.ceil(len(np.unique(preds)) / 5)), 5, figsize=(20, 20))
         axs = list(axs.flatten())
+        for gid in np.unique(preds):
+            fnamessub = list(output["#dataset:filename"][gid == preds])
+            fname = random.sample(fnamessub, 1)[0]
 
-        fnamessub = list(output["#dataset:filename"][gid == preds])
-        fnamessub = random.sample(fnamessub, ngroupsof5 * 5) if len(fnamessub) > ngroupsof5 * 5 else fnamessub
-
-        for fname in fnamessub:
-            print(fname)
             fullfname = glob.glob(f"{basedir}/**/{fname}*thumb*small*")
-            # print(hqc_results_tsv)
-            print(f"This is the filename name: {basedir}")
             io = cv2.cvtColor(cv2.imread(fullfname[0]), cv2.COLOR_BGR2RGB)
             axs.pop().imshow(io)
 
-        plt.savefig(os.path.join(plots_outdir, f'group_{gid}.png'))
+        plt.savefig(os.path.join(plots_outdir, f'allgroups.png'))
         plt.close(fig)
-
-
-    # ------------------------- MAKE OVERVIEW PLOT ------------------------- #
-    basedir = os.path.dirname(hqc_results_tsv_path)
-
-    fig, axs = plt.subplots(int(np.ceil(len(np.unique(preds)) / 5)), 5, figsize=(20, 20))
-    axs = list(axs.flatten())
-    for gid in np.unique(preds):
-        fnamessub = list(output["#dataset:filename"][gid == preds])
-        fname = random.sample(fnamessub, 1)[0]
-
-        fullfname = glob.glob(f"{basedir}/**/{fname}*thumb*small*")
-        io = cv2.cvtColor(cv2.imread(fullfname[0]), cv2.COLOR_BGR2RGB)
-        axs.pop().imshow(io)
-
-    plt.savefig(os.path.join(plots_outdir, f'allgroups.png'))
-    plt.close(fig)
 
 
     return output, preds
@@ -363,6 +370,7 @@ if __name__ == '__main__':
     parser.add_argument('-r', '--randomseed', type=int, default=None)
     parser.add_argument('-o', '--outdir', type=str,
                         default=None)  # --- change to the same output directory as histoqc output so that UI can refind it without looking else where
+    parser.add_argument('-q', '--disable_save', action="store_true", help="Run silently, do not save any files.")
 
     parser.add_argument('-n', '--nclusters', type=int, default=-1, help="Number of clusters to attempt to divide data into before splitting into cohorts, default -1 of negative 1 makes best guess")
     parser.add_argument('histoqcdir', help="The directory containing the output of HistoQC. This argument is required.", type=str)
