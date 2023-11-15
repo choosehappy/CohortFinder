@@ -28,11 +28,26 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report,confusion_matrix
 
+
 def batcheffecttester(data, columnName, datasub, name):
+    """
+    Batch effect test function between the selected measurements and the user-given label/site information.
+
+    Parameters:
+    - data (pandas.DataFrame): The dataframe of the raw result.tsv file.
+    - columnName (str): The column name for the user-given label/site information (e.g., siteid/labelid).
+    - datasub (pandas.DataFrame): The standardized dataframe with the selected measurements.
+    - name (str): Batch effect test based on Site or Label.
+
+    Returns:
+    - None: All the results are recorded in the log file, including:
+      - Which site(s)/label(s) are significantly related to the batch effects.
+      - Which given measurements drive the batch effect.
+    """
     col = data[columnName]
     logging.info(f"Starting  Batch Effect {name} test...") #--- write to file 
-    df_true=pd.DataFrame(index=set([str(s) for s in col])) #convert sites to strings and then use set to get unique list
-    df_rand=pd.DataFrame(index=set([str(s) for s in col])) #convert sites to strings and then use set to get unique list
+    df_true=pd.DataFrame(index=set([str(s) for s in col])) #convert sites/labels to strings and then use set to get unique list
+    df_rand=pd.DataFrame(index=set([str(s) for s in col])) #convert sites/labels to strings and then use set to get unique list
 
     featimport={}
     for df,ver in zip([df_true,df_rand],['true','random']):
@@ -72,6 +87,63 @@ def batcheffecttester(data, columnName, datasub, name):
 
     logging.info(f"------------------------------------------------") #--- write to file 
 
+def read_siteorlabel_data(columname, data,hqc_results_tsv_path):
+    """
+    Read site or label data from the raw data frame.
+
+    Parameters:
+    - column_name (str): The column name defined by the user.
+    - data (pandas.DataFrame): The raw data frame structure.
+    - hqc_results_tsv_path (str): The complete path for the histoqc result TSV file.
+
+    Returns:
+    - Returns the column name if it exists in the raw data.
+    - Returns an erro
+    """
+
+    if columname in data.columns:
+        col = columname
+        logging.info(f"Label column {col} found")
+        return col
+    else:
+        error_message = f"Label column {columname} *NOT* found, please check if you pre-defined the column {columname} to the {hqc_results_tsv_path} file."
+        logging.error(error_message)
+        raise ValueError(error_message)
+
+def draw_plot(embedding,pred,cmap,linewidths,plots_outdir,suffix,testind=None):
+    """
+    Generate and save a scatter plot based on input data.
+
+    Parameters:
+    - embedding (numpy.ndarray): 2D array representing the embedding data.
+    - pred (numpy.ndarray): Array of predicted labels.
+    - cmap (str): Colormap for the scatter plot.
+    - linewidths (float or None): Optional linewidth for scatter plot markers.
+    - plots_outdir (str): Directory to save the generated plot.
+    - suffix (str): Suffix to be used in the saved plot filename.
+    - testind (numpy.ndarray or None): Indices for marking specific points-split test/train (optional).
+
+    Returns:
+    - None
+
+    Description:
+    This function generates a scatter plot based on the provided embedding and prediction data.
+    If 'testind' is specified, different markers are used for selected and non-selected points.
+    The resulting plot is saved in the specified 'plots_outdir' with the given 'suffix'.
+    """
+
+    plt.figure(figsize=(20, 20))
+    if testind.empty:
+        if linewidths != None:
+            plt.scatter(embedding[:, 0], embedding[:, 1], c=pred, cmap=cmap, linewidths=linewidths)
+        else:
+            plt.scatter(embedding[:, 0], embedding[:, 1], c=pred, cmap=cmap)
+        plt.savefig(os.path.join(plots_outdir, f'{suffix}.png'))
+    else:
+        plt.scatter(embedding[testind, 0], embedding[testind, 1], c=pred[testind], cmap=cmap, marker='+')
+        plt.scatter(embedding[~testind, 0], embedding[~testind, 1], c=pred[~testind], cmap=cmap, marker='x')
+        plt.savefig(os.path.join(plots_outdir, f'{suffix}.png'))
+    return
 
 def runCohortFinder(args):
     """
@@ -102,25 +174,36 @@ def runCohortFinder(args):
         preds: A list of integers representing the cluster assignments.
     """
 
-
     # --- set up output file structure
     hqc_results_tsv_path = os.path.join(args.histoqcdir, "results.tsv")
 
+    # --- check if the input histoqc directory and/or results.tsv file exist(s)
+    if (os.path.exists(args.histoqcdir)==False or os.path.exists(hqc_results_tsv_path) == False):
+        error_message = f'"The input histoqc directory ({args.histoqcdir}/) or {hqc_results_tsv_path} does not exist! ' \
+                        f'Please make sure there is no typo in the input directory {args.histoqcdir} and ' \
+                        f'make sure the {args.histoqcdir}/ or {args.histoqcdir}/result.tsv exists!"'
+        raise ValueError(error_message)
+
     if args.outdir is None: # default behavior is to write to the same directory as the histoqc output
         args.outdir = args.histoqcdir
+    else:
+        if not os.path.exists(args.outdir):
+            os.mkdir(args.outdir)
 
     cf_outdir = os.path.join(args.outdir, "cohortfinder_output_" + time.strftime("%Y%m%d-%H%M%S"))
 
     os.mkdir(cf_outdir)
+
+    # --- setup logging
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     results_outdir = os.path.join(cf_outdir, "results_cohortfinder.tsv")
     log_outdir = os.path.join(cf_outdir, "cohortfinder.log")
     plots_outdir = os.path.join(cf_outdir, "plots")
     os.mkdir(plots_outdir)
-    
 
 
-    # --- setup logging
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+
     file = logging.FileHandler(filename=log_outdir)
     file.setLevel(logging.INFO)
     file.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
@@ -142,21 +225,11 @@ def runCohortFinder(args):
 
     labelcol = None
     if args.labelcolumn:
-        if args.labelcolumn in data.columns:
-            labelcol = args.labelcolumn
-            logging.info(f"Label column {labelcol} found")
-        else:
-            logging.warning(f"Label column {labelcol} *NOT* found")
+        labelcol = read_siteorlabel_data(args.labelcolumn, data,hqc_results_tsv_path)
 
     sitecol = None
     if args.sitecolumn:
-        if args.sitecolumn in data.columns:
-            sitecol = args.sitecolumn
-            data[sitecol] = data[sitecol].astype(str)
-            logging.info(f"Site column {sitecol} found")
-        else:
-            logging.warning(f"Site column {sitecol} *NOT* found")
-
+        sitecol = read_siteorlabel_data(args.sitecolumn, data, hqc_results_tsv_path)
 
     pidcol = None
     if args.patiendidcolumn and  args.patiendidcolumn in data.columns:
@@ -167,16 +240,22 @@ def runCohortFinder(args):
             logging.warning(f"Patient column {pidcol} *NOT* found, assuming no duplicates")
             pids=np.arange(len(data))
 
-
-    # --- choose number of clusters
+    # --- choose the number of clusters
+    # if args.nclusters is set to -1, the number of clusters is implicitly computed such that each batch-effect group has an average of 6 patients.
+    # for example, if a cohort has 120 patients and args.nclusters is set to -1, then the number of clusters will be computed as 20.
     if args.nclusters == -1:
         nslides = len(data)
-        nclusters = int(nslides // 6)  # every group has average three patients
+        nclusters = int(nslides // 6)  # nclusters: each batch-effect group has average 6 patients
         logging.info(f"Number of clusters implicitly computed to be:\t{nclusters}")    
     else:
         nclusters = args.nclusters
-        logging.info(f"Number of clusters explicitly set on command line to:\t{nclusters}")    
+        logging.info(f"Number of clusters explicitly set on command line to:\t{nclusters}")
 
+    missing_columns = [col for col in coluse if col not in data.columns]
+    if missing_columns:
+        error_message = f"{missing_columns} not in {hqc_results_tsv_path}! Please check the input columns (-c) and/or {hqc_results_tsv_path}."
+        logging.error(error_message)
+        raise ValueError(error_message)
 
     logging.info(data[coluse].describe())
 
@@ -201,11 +280,8 @@ def runCohortFinder(args):
     # --- save embedding plot
     if not args.disable_save:
         cmap=matplotlib.colors.ListedColormap( matplotlib.cm.get_cmap('Set1').colors+ matplotlib.cm.get_cmap('Set2').colors+  matplotlib.cm.get_cmap('Set3').colors  )
-
-        plt.figure(figsize=(20, 20))
-        plt.scatter(embedding[:, 0], embedding[:, 1], c=preds, cmap=cmap, linewidths=5)
-        plt.savefig(os.path.join(plots_outdir, 'embed.png'))
-    
+        draw_plot(embedding, pred=preds, cmap=cmap, linewidths=5, plots_outdir=plots_outdir, suffix='embed',testind=pd.Series([]))
+        logging.info("The embedding plot was successfully saved!")
     logging.info(Counter(preds))
 
 
@@ -224,12 +300,9 @@ def runCohortFinder(args):
             labellookup={ v:i for i,v in enumerate(set(data[labelcol]))}
             labelids = [labellookup[s] for s in data[labelcol]]
             nlabels = len(labellookup)
-            
-            
-            plt.figure(figsize=(20, 20))
-            plt.scatter(embedding[:, 0], embedding[:, 1], c=labelids, cmap=cmap)
-            plt.savefig(os.path.join(plots_outdir, 'embed_by_label.png'))
 
+            draw_plot(embedding, pred=labelids, cmap=cmap, linewidths=None, plots_outdir=plots_outdir, suffix='embed_by_label',testind=pd.Series([]))
+            logging.info("The label embedding plot was successfully saved!")
         logging.info(Counter(data[labelcol]))
         
         
@@ -243,11 +316,10 @@ def runCohortFinder(args):
             sitelookup={ v:i for i,v in enumerate(set(data[sitecol]))}
             siteids = [sitelookup[s] for s in data[sitecol]]
             nsites = len(sitelookup)
-            
-            plt.figure(figsize=(20, 20))
-            plt.scatter(embedding[:, 0], embedding[:, 1], c=siteids, cmap=cmap)
-            plt.savefig(os.path.join(plots_outdir, 'embed_by_site.png'))
 
+            draw_plot(embedding, pred=siteids, cmap=cmap, linewidths=None, plots_outdir=plots_outdir,
+                      suffix='embed_by_site',testind=pd.Series([]))
+            logging.info("The site embedding plot was successfully saved!")
         logging.info(Counter(data[sitecol]))
         
 
@@ -290,13 +362,9 @@ def runCohortFinder(args):
     
     if not args.disable_save:
         # --- plot training testing split. + is test, x is train
-        plt.figure(figsize=(20, 20))
         testind = output["testind"] == True
-        plt.scatter(embedding[testind, 0], embedding[testind, 1], c=preds[testind], cmap=cmap, marker='+')
-        plt.scatter(embedding[~testind, 0], embedding[~testind, 1], c=preds[~testind], cmap=cmap, marker='x')
-        plt.savefig(os.path.join(plots_outdir, 'embed_split.png'))
-
-
+        draw_plot(embedding,pred=preds,cmap=cmap, linewidths=None,plots_outdir=plots_outdir,suffix='embed_split',testind=testind)
+        logging.info("The training/testing split embedding plot was successfully saved!")
         # ------------------------- WRITE TSV OUTPUT ------------------------- #
         with open(results_outdir, 'w') as cf_out:
             with open(hqc_results_tsv_path, 'r') as f:
@@ -316,6 +384,9 @@ def runCohortFinder(args):
 
         # ------------------------- MAKE GROUP PLOTS ------------------------- #
         basedir = os.path.dirname(hqc_results_tsv_path)
+        # Visualize cluster results with thumbnails in the contact sheet.
+        # Set the number of thumbnails in each row to 5 by default.
+        # 'ngroupsof5' represents the number of rows for the visualization results.
         ngroupsof5 = 3
         for gid in np.unique(preds):
             fig, axs = plt.subplots(ngroupsof5, 5, figsize=(20, 20))
@@ -327,10 +398,15 @@ def runCohortFinder(args):
             for fname in fnamessub:
                 print(fname)
                 fullfname = glob.glob(f"{basedir}/**/{fname}*thumb*small*")
+                if (len(fullfname) ==0):
+                    error_message = f"There is no thumbnail images in the subfolders of {basedir}. Please check!"
+                    logging.error(error_message)
+                    raise ValueError(error_message)
                 # print(hqc_results_tsv)
-                print(f"This is the filename name: {basedir}")
-                io = cv2.cvtColor(cv2.imread(fullfname[0]), cv2.COLOR_BGR2RGB)
-                axs.pop().imshow(io)
+                else:
+                    print(f"This is the filename name: {basedir}")
+                    io = cv2.cvtColor(cv2.imread(fullfname[0]), cv2.COLOR_BGR2RGB)
+                    axs.pop().imshow(io)
 
             plt.savefig(os.path.join(plots_outdir, f'group_{gid}.png'))
             plt.close(fig)
@@ -352,13 +428,14 @@ def runCohortFinder(args):
         plt.savefig(os.path.join(plots_outdir, f'allgroups.png'))
         plt.close(fig)
 
+    logging.info(f'CohortFinder has ran successfully!')
 
     return output, preds
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Split histoqc tsv into training and testing')
-    parser.add_argument('-c', '--cols', help="columnts to use for clustering, comma seperated", type=str,
+    parser.add_argument('-c', '--cols', help="columns to use for clustering, comma seperated", type=str,
                         default="mpp_x,mpp_y,michelson_contrast,rms_contrast,grayscale_brightness,chan1_brightness,chan2_brightness,"
                                 "chan3_brightness,chan1_brightness_YUV,chan2_brightness_YUV,chan3_brightness_YUV")
     parser.add_argument('-l', '--labelcolumn', help="column name associated with a 0,1 label", type=str, default=None)
@@ -374,10 +451,8 @@ if __name__ == '__main__':
 
     parser.add_argument('-n', '--nclusters', type=int, default=-1, help="Number of clusters to attempt to divide data into before splitting into cohorts, default -1 of negative 1 makes best guess")
     parser.add_argument('histoqcdir', help="The directory containing the output of HistoQC. This argument is required.", type=str)
-    # -- add batch effect test
-    args = parser.parse_args()
+    args = parser.parse_args(git status)
     print(args)
-
 
     # ------------------------- RUN COHORTFINDER ------------------------- #
     output, preds = runCohortFinder(args)
