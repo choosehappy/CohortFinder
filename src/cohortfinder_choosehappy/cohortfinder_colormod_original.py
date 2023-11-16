@@ -87,9 +87,9 @@ def batcheffecttester(data, columnName, datasub, name):
 
     logging.info(f"------------------------------------------------") #--- write to file 
 
-def read_siteorlabel_data(columname, data,hqc_results_tsv_path):
+def check_for_column(columname, data,hqc_results_tsv_path):
     """
-    Read site or label data from the raw data frame.
+    Check the site or label data from the raw data frame.
 
     Parameters:
     - column_name (str): The column name defined by the user.
@@ -103,10 +103,10 @@ def read_siteorlabel_data(columname, data,hqc_results_tsv_path):
 
     if columname in data.columns:
         col = columname
-        logging.info(f"Label column {col} found")
+        logging.info(f"Column {col} found")
         return col
     else:
-        error_message = f"Label column {columname} *NOT* found, please check if you pre-defined the column {columname} to the {hqc_results_tsv_path} file."
+        error_message = f"Column {columname} *NOT* found, please check if the column named {columname} is in the {hqc_results_tsv_path} file."
         logging.error(error_message)
         raise ValueError(error_message)
 
@@ -178,7 +178,7 @@ def runCohortFinder(args):
     hqc_results_tsv_path = os.path.join(args.histoqcdir, "results.tsv")
 
     # --- check if the input histoqc directory and/or results.tsv file exist(s)
-    if (os.path.exists(args.histoqcdir)==False or os.path.exists(hqc_results_tsv_path) == False):
+    if not (os.path.exists(args.histoqcdir) and os.path.exists(hqc_results_tsv_path)):
         error_message = f'"The input histoqc directory ({args.histoqcdir}/) or {hqc_results_tsv_path} does not exist! ' \
                         f'Please make sure there is no typo in the input directory {args.histoqcdir} and ' \
                         f'make sure the {args.histoqcdir}/ or {args.histoqcdir}/result.tsv exists!"'
@@ -225,11 +225,11 @@ def runCohortFinder(args):
 
     labelcol = None
     if args.labelcolumn:
-        labelcol = read_siteorlabel_data(args.labelcolumn, data,hqc_results_tsv_path)
+        labelcol = check_for_column(args.labelcolumn, data,hqc_results_tsv_path)
 
     sitecol = None
     if args.sitecolumn:
-        sitecol = read_siteorlabel_data(args.sitecolumn, data, hqc_results_tsv_path)
+        sitecol = check_for_column(args.sitecolumn, data, hqc_results_tsv_path)
 
     pidcol = None
     if args.patiendidcolumn and  args.patiendidcolumn in data.columns:
@@ -251,11 +251,8 @@ def runCohortFinder(args):
         nclusters = args.nclusters
         logging.info(f"Number of clusters explicitly set on command line to:\t{nclusters}")
 
-    missing_columns = [col for col in coluse if col not in data.columns]
-    if missing_columns:
-        error_message = f"{missing_columns} not in {hqc_results_tsv_path}! Please check the input columns (-c) and/or {hqc_results_tsv_path}."
-        logging.error(error_message)
-        raise ValueError(error_message)
+    for col in coluse:
+        check_for_column(col,data,hqc_results_tsv_path)
 
     logging.info(data[coluse].describe())
 
@@ -397,14 +394,15 @@ def runCohortFinder(args):
 
             for fname in fnamessub:
                 print(fname)
-                fullfname = glob.glob(f"{basedir}/**/{fname}*thumb*small*")
+                fullfname = glob.glob(f"{basedir}/{fname}/{fname}*thumb*small*")
                 if (len(fullfname) ==0):
-                    error_message = f"There is no thumbnail images in the subfolders of {basedir}. Please check!"
+                    error_message = f"There is *NO* thumbnail images in the subfolders of {basedir}/{fname}/. Please check if the input histoqc folder is complete. "
                     logging.error(error_message)
                     raise ValueError(error_message)
                 # print(hqc_results_tsv)
                 else:
-                    print(f"This is the filename name: {basedir}")
+                    logging.info(f"This is the filename name: {fullfname}")
+                    # print(f"This is the filename name: {basedir}")
                     io = cv2.cvtColor(cv2.imread(fullfname[0]), cv2.COLOR_BGR2RGB)
                     axs.pop().imshow(io)
 
@@ -428,7 +426,7 @@ def runCohortFinder(args):
         plt.savefig(os.path.join(plots_outdir, f'allgroups.png'))
         plt.close(fig)
 
-    logging.info(f'CohortFinder has ran successfully!')
+    logging.info(f'CohortFinder has run successfully!')
 
     return output, preds
 
@@ -451,7 +449,7 @@ if __name__ == '__main__':
 
     parser.add_argument('-n', '--nclusters', type=int, default=-1, help="Number of clusters to attempt to divide data into before splitting into cohorts, default -1 of negative 1 makes best guess")
     parser.add_argument('histoqcdir', help="The directory containing the output of HistoQC. This argument is required.", type=str)
-    args = parser.parse_args(git status)
+    args = parser.parse_args()
     print(args)
 
     # ------------------------- RUN COHORTFINDER ------------------------- #
