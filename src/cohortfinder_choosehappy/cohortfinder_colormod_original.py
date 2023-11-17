@@ -89,16 +89,16 @@ def batcheffecttester(data, columnName, datasub, name):
 
 def check_for_column(columname, data,hqc_results_tsv_path):
     """
-    Check the site or label data from the raw data frame.
+    Check the if the column exists in the raw tsv file.
 
     Parameters:
-    - column_name (str): The column name defined by the user.
+    - column_name (str): The column name.
     - data (pandas.DataFrame): The raw data frame structure.
     - hqc_results_tsv_path (str): The complete path for the histoqc result TSV file.
 
     Returns:
     - Returns the column name if it exists in the raw data.
-    - Returns an erro
+    - Returns an error
     """
 
     if columname in data.columns:
