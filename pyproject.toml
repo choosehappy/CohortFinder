@@ -1,19 +1,26 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = [
+  "setuptools >= 42",
+  "wheel",
+  "setuptools_scm[toml]>=3.4",
+]
 build-backend = "setuptools.build_meta"
 
-[project]
-name = "cohortfinder_choosehappy"
-version = "0.0.1"
-description = "Intelligent data partitioning using quality control metrics"
-readme = "README.md"
-requires-python = ">=3.8"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-]
+[tool.setuptools_scm]
+write_to = "cohortfinder/_version.py"
+version_scheme = "post-release"
 
-[project.urls]
-"Homepage" = "https://github.com/choosehappy/CohortFinder"
-"Bug Tracker" = "https://github.com/choosehappy/CohortFinder/issues"
+[tool.pytest.ini_options]
+addopts = "-v"
+
+[tool.coverage.run]
+source = ["cohortfinder"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "raise NotImplementedError",
+  "if TYPE_CHECKING:",
+  "if MYPY:",
+  "except ImportError:",
+]

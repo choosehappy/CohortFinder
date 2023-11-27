@@ -102,14 +102,10 @@ def runCohortFinder(args):
         preds: A list of integers representing the cluster assignments.
     """
 
+    outdir = os.path.dirname(args.resultsfilepath)
+    # assumes that .tsv file is in the histoqc output directory
 
-    # --- set up output file structure
-    hqc_results_tsv_path = os.path.join(args.histoqcdir, "results.tsv")
-
-    if args.outdir is None: # default behavior is to write to the same directory as the histoqc output
-        args.outdir = args.histoqcdir
-
-    cf_outdir = os.path.join(args.outdir, "cohortfinder_output_" + time.strftime("%Y%m%d-%H%M%S"))
+    cf_outdir = os.path.join(outdir, "cohortfinder_output_" + time.strftime("%Y%m%d-%H%M%S"))
 
     os.mkdir(cf_outdir)
     results_outdir = os.path.join(cf_outdir, "results_cohortfinder.tsv")
@@ -136,7 +132,7 @@ def runCohortFinder(args):
 
     coluse = args.cols.split(",")
 
-    data = pd.read_csv(hqc_results_tsv_path, sep='\t', header=5)
+    data = pd.read_csv(args.resultsfilepath, sep='\t', header=5)
     logging.info(data)
     logging.info(f'Number of slides:\t{len(data)}')
 
@@ -159,8 +155,8 @@ def runCohortFinder(args):
 
 
     pidcol = None
-    if args.patiendidcolumn and  args.patiendidcolumn in data.columns:
-            pidcol = args.patiendidcolumn
+    if args.patientidcolumn and  args.patientidcolumn in data.columns:
+            pidcol = args.patientidcolumn
             pids = data[pidcol]
             logging.info(f"Patient column {pidcol} found")
     else:
@@ -299,7 +295,7 @@ def runCohortFinder(args):
 
         # ------------------------- WRITE TSV OUTPUT ------------------------- #
         with open(results_outdir, 'w') as cf_out:
-            with open(hqc_results_tsv_path, 'r') as f:
+            with open(args.resultsfilepath, 'r') as f:
                 for line in f:
                     if line.startswith("#"):
                         cf_out.write(line.replace("dataset:filename", "prevcols:filename"))
@@ -315,7 +311,7 @@ def runCohortFinder(args):
 
 
         # ------------------------- MAKE GROUP PLOTS ------------------------- #
-        basedir = os.path.dirname(hqc_results_tsv_path)
+        basedir = os.path.dirname(args.resultsfilepath)
         ngroupsof5 = 3
         for gid in np.unique(preds):
             fig, axs = plt.subplots(ngroupsof5, 5, figsize=(20, 20))
@@ -337,7 +333,7 @@ def runCohortFinder(args):
 
 
         # ------------------------- MAKE OVERVIEW PLOT ------------------------- #
-        basedir = os.path.dirname(hqc_results_tsv_path)
+        basedir = os.path.dirname(args.resultsfilepath)
 
         fig, axs = plt.subplots(int(np.ceil(len(np.unique(preds)) / 5)), 5, figsize=(20, 20))
         axs = list(axs.flatten())
@@ -363,17 +359,15 @@ if __name__ == '__main__':
                                 "chan3_brightness,chan1_brightness_YUV,chan2_brightness_YUV,chan3_brightness_YUV")
     parser.add_argument('-l', '--labelcolumn', help="column name associated with a 0,1 label", type=str, default=None)
     parser.add_argument('-s', '--sitecolumn', help="column name associated with site variable", type=str, default=None)
-    parser.add_argument('-p', '--patiendidcolumn', help="column name associated with patient id, ensuring slides are grouped", type=str, default=None)
+    parser.add_argument('-p', '--patientidcolumn', help="column name associated with patient id, ensuring slides are grouped", type=str, default=None)
     parser.add_argument('-t', '--testpercent', type=float, default=.2)
     parser.add_argument('-b', '--batcheffectsitetest', action="store_true")
     parser.add_argument('-y', '--batcheffectlabeltest', action="store_true")
     parser.add_argument('-r', '--randomseed', type=int, default=None)
-    parser.add_argument('-o', '--outdir', type=str,
-                        default=None)  # --- change to the same output directory as histoqc output so that UI can refind it without looking else where
     parser.add_argument('-q', '--disable_save', action="store_true", help="Run silently, do not save any files.")
 
     parser.add_argument('-n', '--nclusters', type=int, default=-1, help="Number of clusters to attempt to divide data into before splitting into cohorts, default -1 of negative 1 makes best guess")
-    parser.add_argument('histoqcdir', help="The directory containing the output of HistoQC. This argument is required.", type=str)
+    parser.add_argument('resultsfilepath', help="The full path to the HistoQC output file. This argument is required.", type=str)
     # -- add batch effect test
     args = parser.parse_args()
     print(args)

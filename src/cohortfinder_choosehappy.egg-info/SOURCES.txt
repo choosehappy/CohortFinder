@@ -1,9 +1,0 @@
-LICENSE
-README.md
-pyproject.toml
-src/cohortfinder_choosehappy/__init__.py
-src/cohortfinder_choosehappy/cohortfinder_colormod_original.py
-src/cohortfinder_choosehappy.egg-info/PKG-INFO
-src/cohortfinder_choosehappy.egg-info/SOURCES.txt
-src/cohortfinder_choosehappy.egg-info/dependency_links.txt
-src/cohortfinder_choosehappy.egg-info/top_level.txt

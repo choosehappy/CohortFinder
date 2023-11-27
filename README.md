@@ -70,7 +70,7 @@ python3 cohortfinder_colormod_original.py --help
 ```
 
 ```
-usage: cohortfinder_colormod_original.py [-h] [-c COLS] [-l LABELCOLUMN] [-s SITECOLUMN] [-p PATIENDIDCOLUMN] [-t TESTPERCENT] [-b] [-y] [-r RANDOMSEED] [-o OUTDIR] [-n NCLUSTERS] histoqcdir
+usage: cohortfinder_colormod_original.py [-h] [-c COLS] [-l LABELCOLUMN] [-s SITECOLUMN] [-p PATIENTIDCOLUMN] [-t TESTPERCENT] [-b] [-y] [-r RANDOMSEED] [-o OUTDIR] [-n NCLUSTERS] histoqcdir
 
 Split histoqc tsv into training and testing
 
@@ -84,7 +84,7 @@ optional arguments:
                         column name associated with a 0,1 label
   -s SITECOLUMN, --sitecolumn SITECOLUMN
                         column name associated with site variable
-  -p PATIENDIDCOLUMN, --patiendidcolumn PATIENDIDCOLUMN
+  -p PATIENTIDCOLUMN, --patientidcolumn PATIENTIDCOLUMN
                         column name associated with patient id, ensuring slides are grouped
   -t TESTPERCENT, --testpercent TESTPERCENT
   -b, --batcheffectsitetest
