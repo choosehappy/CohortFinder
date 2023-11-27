@@ -28,7 +28,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report,confusion_matrix
 
-
 def batcheffecttester(data, columnName, datasub, name):
     """
     Batch effect test function between the selected measurements and the user-given label/site information.
@@ -169,7 +168,7 @@ def runCohortFinder(args):
 
 
     Args:
-        args: A namespace (like that returned by argparse) containing the arguments for CohortFinder.
+        args: A namespace (like argparse.Namespace) containing the arguments for CohortFinder.
     Returns:
         output: A pandas dataframe containing the input data and the cohortfinder results.
         preds: A list of integers representing the cluster assignments.
@@ -424,7 +423,6 @@ def runCohortFinder(args):
     logging.info(f'CohortFinder has run successfully!')
 
     return output, preds
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Split histoqc tsv into training and testing')
