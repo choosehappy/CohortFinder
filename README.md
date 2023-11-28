@@ -12,7 +12,7 @@ Intelligent data partitioning using quality control metrics
 ---
 Batch effects (BE) (e.g., scanner, stain variances), are systematic technical differences in data creation unrelated to biological variation. BEs have been shown to negatively impact machine learning (ML) model generalizability. Since they can result in the worst case when partioning patients into training/validation set, where patients in training set come from totally different BE groups from those in validation set. The purpose of the CohortFinder is to provide an intelligent data partition strategy trying to avoid the worst case situation without any manual effort.
 
-CohortFinder has the following two functions:
+CohortFinder has the following functionality:
 
 1. Cluster patients into different BE groups using quality control metrics
 2. Partition patients into training/validation set, making sure the patients in training or validation set come from all the BE groups
@@ -24,33 +24,46 @@ This tool can increase the performance and generalizability of machine learning 
 # Requirements
 
 ---
-Tested with Python 3.7.10
+Tested with Python 3.8.18
 
 Requires:
 1. Python 
 2. pip
 
-And the following additional python package:
+And the following python packages:
 1. matplotlib
 
 2. numpy
 
-3. opencv_python_headless
+3. opencv-python-headless
 
-4. scikit_learn
+4. scikit-learn
 
 5. scipy
 
 6. umap
 
-7. umap_learn
+7. pandas
 
    
 
-You can install the python requirements using the following command line:
-
+# Installation
+### 1. Clone the CohortFinder github repository
 ```
-pip3 install -r requirements.txt
+git clone https://github.com/choosehappy/CohortFinder.git
+```
+
+### 2. (optional) Create a virtual environment
+A python virtual environment (https://docs.python.org/3/library/venv.html) is the recommended dependency manager for CohortFinder.
+```
+cd CohortFinder
+python3 -m venv cf_env
+source cf_env/bin/activate
+```
+
+### 3. Install CohortFinder as a python package
+```
+pip install .
 ```
 
 
@@ -65,21 +78,22 @@ Please see  [Histoqc](https://github.com/choosehappy/HistoQC), this is an open-s
 
 ---
 The parameters CohortFinder used are as below:
-```bash
-python3 cohortfinder_colormod_original.py --help
+```
+python3 -m cohortfinder --help
 ```
 
 ```
-usage: cohortfinder_colormod_original.py [-h] [-c COLS] [-l LABELCOLUMN] [-s SITECOLUMN] [-p PATIENTIDCOLUMN] [-t TESTPERCENT] [-b] [-y] [-r RANDOMSEED] [-o OUTDIR] [-n NCLUSTERS] histoqcdir
+usage: __main__.py [-h] [-c COLS] [-l LABELCOLUMN] [-s SITECOLUMN] [-p PATIENTIDCOLUMN] [-t TESTPERCENT] [-b] [-y] [-r RANDOMSEED] [-q] [-n NCLUSTERS]
+                   resultsfilepath
 
 Split histoqc tsv into training and testing
 
 positional arguments:
-  histoqcdir            The directory containing the output of HistoQC. This argument is required.
+  resultsfilepath       The full path to the HistoQC output file. This argument is required.
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
-  -c COLS, --cols COLS  columnts to use for clustering, comma seperated
+  -c COLS, --cols COLS  columns to use for clustering, comma seperated
   -l LABELCOLUMN, --labelcolumn LABELCOLUMN
                         column name associated with a 0,1 label
   -s SITECOLUMN, --sitecolumn SITECOLUMN
@@ -90,10 +104,16 @@ optional arguments:
   -b, --batcheffectsitetest
   -y, --batcheffectlabeltest
   -r RANDOMSEED, --randomseed RANDOMSEED
-  -o OUTDIR, --outdir OUTDIR
+  -q, --disable_save    Run silently, do not save any files.
   -n NCLUSTERS, --nclusters NCLUSTERS
                         Number of clusters to attempt to divide data into before splitting into cohorts, default -1 of negative 1 makes best guess
 ```
+
+Example run command:
+```
+python3 -m cohortfinder -n 4 -t 0.3 "/full/path/to/your/results.tsv"
+```
+Replace the filepath with a real file path 
 
 
 
@@ -159,20 +179,11 @@ This is the description of the metrics used to identify the batch effects in our
 ```
 
 ```
-histoqcdir: the directory containing histoqc's output.
-```
-histoqcdir should be the same directory that was passed to the "--output" flag in histoqc. See "--output" in [HistoQC's basic usage section](https://github.com/choosehappy/HistoQC#basic-usage)
-
-### Run
-
-Go to the cohortfinder repository. Download or simply git-cloned, using the following typical command line for running the tool like. And you can also try the other function using the above parameters.
-
-```python
- python3 cohortfinder_colormod_original.py -n 1 "{the HistoQC output path}"
+resutsfilepath: The full path to the HistoQC results.tsv file. See cohortfinder/test/histoqc_outdir/results.tsv for an example.
 ```
 
 
-### Use the results of CohortFinder
+# CohortFinder Output File Structure
 
 Once you run the CohortFinder, you will get a cohortfinder result file called 'results_cohortfinder.tsv'. You will see two columns, one is called 'groupid', and the other is called 'testind', the testind == 1 represents the patients is partitioned into testing set and testind == 0 represents the patient is partitioned into the training set. You can simply use that patient partitioning results  to set up the training set and test/val set for your machine learning model!
 
@@ -206,7 +217,7 @@ The results_cohortfinder.tsv has four more columns than the histoqc results.tsv 
 4. **embed_y**: the UMAP embedding y coordinates.
 
 
-#### 2. Embeded plots
+#### 2. Embedding plots
 
 Each point represents a patient and different colors represent different batch effect groups
 
