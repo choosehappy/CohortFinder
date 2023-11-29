@@ -24,7 +24,7 @@ This tool can increase the performance and generalizability of machine learning 
 # Requirements
 
 ---
-Tested with Python 3.8.18
+Tested with Python 3.8.18 and 3.9.18
 
 Requires:
 1. Python 
