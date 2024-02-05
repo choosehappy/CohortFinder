@@ -93,7 +93,7 @@ def check_for_column(columname, data,hqc_results_tsv_path):
     Parameters:
     - column_name (str): The column name.
     - data (pandas.DataFrame): The raw data frame structure.
-    - hqc_results_tsv_path (str): The complete path for the histoqc result TSV file.
+    - hqc_results_tsv_path (str): The complete path for the histoqc or mrqy result TSV file.
 
     Returns:
     - Returns the column name if it exists in the raw data.
@@ -146,13 +146,13 @@ def draw_plot(embedding,pred,cmap,linewidths,plots_outdir,suffix,testind=None):
 
 def runCohortFinder(args):
     """
-    Using the output tsv file from HistoQC, produce a new tsv file containing four new columns: embed_x, embed_y, groupid, testind
+    Using the output tsv file from HistoQC/MRQy, produce a new tsv file containing four new columns: embed_x, embed_y, groupid, testind
 
     Unless the disable_save flag is set, this function will also produce the following file structure in the directory containing the input results.tsv file:
 
-    outdir/ (histoqc output directory)
+    outdir/ (histoqc/mrqy output directory)
         results.tsv
-        ... (histoqc output folders)
+        ... (histoqc/mrqy output folders)
         cohortfinder_output_DATE_TIME/
             results_cohortfinder.tsv
             cohortfinder.log
@@ -177,9 +177,9 @@ def runCohortFinder(args):
     outdir = os.path.dirname(args.resultsfilepath)
 
 
-    # --- check if the input histoqc directory and/or results.tsv file exist(s)
+    # --- check if the input histoqc/mrqy directory and/or results.tsv file exist(s)
     if not (os.path.exists(outdir) and os.path.exists(args.resultsfilepath)):
-        error_message = f'"The input histoqc directory ({outdir}/) or {args.resultsfilepath} does not exist! ' \
+        error_message = f'"The input histoqc/mrqy directory ({outdir}/) or {args.resultsfilepath} does not exist! ' \
                         f'Please make sure there is no typo in the input directory {outdir} and ' \
                         f'make sure the {outdir}/ or {outdir}/result.tsv exists!"'
         raise ValueError(error_message)
@@ -208,13 +208,22 @@ def runCohortFinder(args):
     # --- setup seed for reproducability
     seed = args.randomseed if (args.randomseed) else random.randrange(
         sys.maxsize)  # get a random seed so that we can reproducibly do the cross validation setup
+
     random.seed(seed)  # set the seed
-    np, random.seed(seed)
+    np.random.seed(seed)
     logging.info(f"random seed (note down for reproducibility): {seed}")
+    quality_control_tool = args.quality_control_tool
 
     coluse = args.cols.split(",")
-
-    data = pd.read_csv(args.resultsfilepath, sep='\t', header=5)
+    if quality_control_tool == 'histoqc':
+        col_name_filename = "#dataset:filename"
+        data = pd.read_csv(args.resultsfilepath, sep='\t', header=5)
+    elif quality_control_tool == 'mrqy':
+        col_name_filename = "#dataset:Patient"
+        data = pd.read_csv(args.resultsfilepath, sep='\t', header=2)
+    else:
+        error_message = f'the input quality control tool name is in an incorrect version, please make sure use either of the following option: histoqc or mrqy!'
+        raise ValueError(error_message)
     logging.info(data)
     logging.info(f'Number of slides:\t{len(data)}')
 
@@ -263,8 +272,9 @@ def runCohortFinder(args):
 
 
     # --- back to cohort finder
-    embedding = umap.UMAP(metric="correlation").fit_transform(datasub)
-    clustered = KMeans(n_clusters=nclusters).fit(embedding)
+
+    embedding = umap.UMAP(metric="correlation",random_state=seed).fit_transform(datasub)
+    clustered = KMeans(n_clusters=nclusters,random_state=seed).fit(embedding)
     #clustered = SpectralClustering(n_clusters=nclusters).fit(embedding)
     preds = clustered.labels_
 
@@ -277,9 +287,12 @@ def runCohortFinder(args):
     logging.info(Counter(preds))
 
 
-    # --- setup output dataframe with histoqc header
+    # --- setup output dataframe with histoqc/mrqy header
     output = pd.DataFrame(data=datasub, columns=coluse)
-    output.insert(0, "#dataset:filename", data["#dataset:filename"])
+
+    output.insert(0, col_name_filename, data[col_name_filename])
+
+
 
 
     if labelcol:
@@ -292,7 +305,6 @@ def runCohortFinder(args):
             labellookup={ v:i for i,v in enumerate(set(data[labelcol]))}
             labelids = [labellookup[s] for s in data[labelcol]]
             nlabels = len(labellookup)
-
             draw_plot(embedding, pred=labelids, cmap=cmap, linewidths=None, plots_outdir=plots_outdir, suffix='embed_by_label',testind=pd.Series([]))
             logging.info("The label embedding plot was successfully saved!")
         logging.info(Counter(data[labelcol]))
@@ -333,7 +345,6 @@ def runCohortFinder(args):
                 idx = np.where((gid == preds) & (labels == lid) & (sid == sites))[0]
                 if len(idx)==0:
                     continue
-
                 #testidx = np.random.rand(len(idx))<args.testpercent
                 sortidx=np.argsort(np.random.rand(len(idx)))
                 testidx = np.zeros(len(sortidx),dtype=bool)
@@ -384,14 +395,17 @@ def runCohortFinder(args):
             fig, axs = plt.subplots(ngroupsof5, 5, figsize=(20, 20))
             axs = list(axs.flatten())
 
-            fnamessub = list(output["#dataset:filename"][gid == preds])
+            fnamessub = list(output[col_name_filename][gid == preds])
             fnamessub = random.sample(fnamessub, ngroupsof5 * 5) if len(fnamessub) > ngroupsof5 * 5 else fnamessub
 
             for fname in fnamessub:
                 print(fname)
-                fullfname = glob.glob(f"{basedir}/{fname}/{fname}*thumb*small*")
+                if quality_control_tool == 'histoqc':
+                    fullfname = glob.glob(f"{basedir}/{fname}/{fname}*thumb*small*")
+                elif quality_control_tool=='mrqy':
+                    fullfname = glob.glob(f"{basedir}/{fname}/*.png")
                 if (len(fullfname) ==0):
-                    error_message = f"There is *NO* thumbnail images in the subfolders of {basedir}/{fname}/. Please check if the input histoqc folder is complete. "
+                    error_message = f"There is *NO* thumbnail images in the subfolders of {basedir}/{fname}/. Please check if the input histoqc/mrqy folder is complete. "
                     logging.error(error_message)
                     raise ValueError(error_message)
                 # print(hqc_results_tsv)
@@ -410,10 +424,13 @@ def runCohortFinder(args):
         fig, axs = plt.subplots(int(np.ceil(len(np.unique(preds)) / 5)), 5, figsize=(20, 20))
         axs = list(axs.flatten())
         for gid in np.unique(preds):
-            fnamessub = list(output["#dataset:filename"][gid == preds])
+            fnamessub = list(output[col_name_filename][gid == preds])
             fname = random.sample(fnamessub, 1)[0]
 
-            fullfname = glob.glob(f"{basedir}/**/{fname}*thumb*small*")
+            if quality_control_tool == 'histoqc':
+                fullfname = glob.glob(f"{basedir}/{fname}/{fname}*thumb*small*")
+            elif quality_control_tool == 'mrqy':
+                fullfname = glob.glob(f"{basedir}/{fname}/*.png")
             io = cv2.cvtColor(cv2.imread(fullfname[0]), cv2.COLOR_BGR2RGB)
             axs.pop().imshow(io)
 
@@ -425,10 +442,12 @@ def runCohortFinder(args):
     return output, preds
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Split histoqc tsv into training and testing')
+    parser = argparse.ArgumentParser(description='Split histoqc/mrqy tsv into training and testing')
     parser.add_argument('-c', '--cols', help="columns to use for clustering, comma seperated", type=str,
                         default="mpp_x,mpp_y,michelson_contrast,rms_contrast,grayscale_brightness,chan1_brightness,chan2_brightness,"
                                 "chan3_brightness,chan1_brightness_YUV,chan2_brightness_YUV,chan3_brightness_YUV")
+    #metrics used for MRQy:
+    #MEAN,RNG,VAR,CV,CPP,PSNR,SNR1,SNR2,SNR3,SNR4,CNR,CVP,CJV,EFC,FBER
     parser.add_argument('-l', '--labelcolumn', help="column name associated with a 0,1 label", type=str, default=None)
     parser.add_argument('-s', '--sitecolumn', help="column name associated with site variable", type=str, default=None)
     parser.add_argument('-p', '--patientidcolumn', help="column name associated with patient id, ensuring slides are grouped", type=str, default=None)
@@ -437,9 +456,9 @@ if __name__ == '__main__':
     parser.add_argument('-y', '--batcheffectlabeltest', action="store_true")
     parser.add_argument('-r', '--randomseed', type=int, default=None)
     parser.add_argument('-q', '--disable_save', action="store_true", help="Run silently, do not save any files.")
-
+    parser.add_argument('-d', '--quality_control_tool', type=str, default='histoqc',help="Which quality tool is used here: HistoQC or MRQy (--histoqc/ --mrqy)")
     parser.add_argument('-n', '--nclusters', type=int, default=-1, help="Number of clusters to attempt to divide data into before splitting into cohorts, default -1 of negative 1 makes best guess")
-    parser.add_argument('resultsfilepath', help="The full path to the HistoQC output file. This argument is required.", type=str)
+    parser.add_argument('resultsfilepath', help="The full path to the HistoQC/MRQy output file. This argument is required.", type=str)
     # -- add batch effect test
     args = parser.parse_args()
     print(args)

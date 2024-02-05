@@ -70,7 +70,7 @@ pip install .
 
 # Quality Control Metrics Generation
 
-Please see  [Histoqc](https://github.com/choosehappy/HistoQC), this is an open-source quality control tool for digital pathology slides. We use the quality control metrics it generates.
+Please see  [Histoqc](https://github.com/choosehappy/HistoQC) and [MRQy](https://github.com/ccipd/MRQy/), these are 2 open-source quality control tools for digital pathology slides and imaging data. We use the quality control metrics it generates.
 
 
 
@@ -86,10 +86,10 @@ python3 -m cohortfinder --help
 usage: __main__.py [-h] [-c COLS] [-l LABELCOLUMN] [-s SITECOLUMN] [-p PATIENTIDCOLUMN] [-t TESTPERCENT] [-b] [-y] [-r RANDOMSEED] [-q] [-n NCLUSTERS]
                    resultsfilepath
 
-Split histoqc tsv into training and testing
+Split histoqc/mrqy tsv into training and testing
 
 positional arguments:
-  resultsfilepath       The full path to the HistoQC output file. This argument is required.
+  resultsfilepath       The full path to the HistoQC/MRQy output file. This argument is required.
 
 options:
   -h, --help            show this help message and exit
@@ -103,8 +103,9 @@ options:
   -t TESTPERCENT, --testpercent TESTPERCENT
   -b, --batcheffectsitetest
   -y, --batcheffectlabeltest
-  -r RANDOMSEED, --randomseed RANDOMSEED
+  -r RANDOMSEED, --randomseed RANDOMSEED, for reproducing the same results for UMAP, k-means and data partitioning
   -q, --disable_save    Run silently, do not save any files.
+  -d, --quality_control_tool Which quality tool is used here: HistoQC or MRQy (--histoqc/ --mrqy)
   -n NCLUSTERS, --nclusters NCLUSTERS
                         Number of clusters to attempt to divide data into before splitting into cohorts, default -1 of negative 1 makes best guess
 ```
@@ -117,10 +118,8 @@ Replace the filepath with a real file path
 
 
 
-### Parameter meaning:
-
-
-
+### Parameter meaning :
+#### HistoQC
 ```
 -c: metrics calculated by HistoQC we used for batch effect group generation, the default metrics are:
 "mpp_x,mpp_y,michelson_contrast,rms_contrast,grayscale_brightness,chan1_brightness,chan2_brightness,chan3_brightness,chan1_brightness_YUV,chan2_brightness_YUV,chan3_brightness_YUV"
@@ -142,45 +141,28 @@ This is the description of the metrics used to identify the batch effects in our
 | Chan2_brightness_YUV   | Mean channel brightness of green color channel of image after converting to YUV color space |
 | Chan3_brightness_YUV   | Mean channel brightness of blue color channel of image after converting to YUV color space |
 
+#### MRQy
 ```
--l: the column contains the patient label information (0,1), this column needs to be manually added into the input data. The default value is None.
+-c: metrics calculated by MRQy we used for batch effect group generation, the default metrics are:
+"MEAN,RNG,VAR,CV,CPP,PSNR,SNR1,SNR2,SNR3,SNR4,CNR,CVP,CJV,EFC,FBER"
 ```
-
-```
--s: the column contains the site id information, this column needs to be manually added into the input data. The default value is None.
-```
-
-```
--p: the column contains the patient id information, this column needs to be manually added into the input data. The default value is None.
-```
-
-```
--t: the percentage of data you want to set as testing set for your machine learning model, default number = 0.2
-```
-
-```
--b: statistical tests for variable confounding, at site level.
-```
-
-```
--y: statistical tests for variable confounding, at label level
-```
-
-```
--r: random seed
-```
-
-```
--o: the output directory. The default value of None causes cohortfinder to use histoqcdir as the output directory.
-```
-
-```
--n: Number of clusters to attempt to divide data into. Positive interger represents the number of batch effect group you want to generate and '-1' will make each batch effect group has average certain number of patients, the default average number of patients is  6.
-```
-
-```
-resutsfilepath: The full path to the HistoQC results.tsv file. See cohortfinder/test/histoqc_outdir/results.tsv for an example.
-```
+| Quality control metric | Description                                                  |
+| ---------------------- | ------------------------------------------------------------ |
+| MEAN                   | Mean of the foreground   |
+| RNG                    | Range of the foreground   |
+| VAR                    | Variance of the foreground |
+| CV                     | Coefficient of variation of the foreground for shadowing and inhomogeneity artifacts |
+| CPP                    | Contrast  per  pixel:  mean  of  the  foreground  filtered  by  a  3×3  2D  Laplacian  kernel  for  shadowing  artifacts |
+| PSNR                   | Peak signal to noise ratio of the foreground  |
+| SNR1                   | Foreground standard deviation (SD) divided by background SD |
+| SNR2                   | Mean of the foreground patch divided by background SD |
+| SNR3                   | Foreground patch SD divided by the centered foreground patch SD |
+| SNR4                   | Mean of the foreground patch divided by mean of the background patch|
+| CNR                    | Contrast to noise ratio for shadowing and noise artifacts |
+| CVP                    | Coefficient of variation of the foreground patch for shading artifacts: foreground patch SD divided by foreground patch mean |
+| CJV                    | Coefficient of joint variation between the foreground and background for aliasing and inhomogeneity artifacts |
+| EFC                    | Entropy focus criterion for motion artifacts |
+| FBER                   | Foreground-background energy ratio for ringing artifacts |
 
 
 # CohortFinder Output File Structure
@@ -189,8 +171,8 @@ Once you run the CohortFinder, you will get a cohortfinder result file called 'r
 
 CohortFinder produces the following ouput file structure:
 ```
-outputdir/ (default is histoqc output directory)
-    ... (histoqc output, including results.tsv)
+outputdir/ (default is histoqc/mrqy output directory)
+    ... (histoqc/mrqy output, including results.tsv)
     cohortfinder_output_DATE_TIME/
         results_cohortfinder.tsv
         cohortfinder.log
@@ -210,7 +192,7 @@ outputdir/ (default is histoqc output directory)
 
 #### 1. Result file and running log
 
-The results_cohortfinder.tsv has four more columns than the histoqc results.tsv file:
+The results_cohortfinder.tsv has four more columns than the histoqc/mrqy results.tsv file:
 1. **groupid**: the batch effect group assigned to the patient by cohortfinder.
 2. **testind**: the testing/training set assignment, where "1" patients were assigned to the testing set and "0" patients were assigned to the training set.
 3. **embed_x**: the UMAP embedding x coordinates.
