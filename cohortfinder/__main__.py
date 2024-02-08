@@ -27,6 +27,7 @@ from sklearn.cluster import KMeans
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report,confusion_matrix
+from sklearn.metrics import silhouette_score,davies_bouldin_score,calinski_harabasz_score
 
 def batcheffecttester(data, columnName, datasub, name):
     """
@@ -206,8 +207,7 @@ def runCohortFinder(args):
 
 
     # --- setup seed for reproducability
-    seed = args.randomseed if (args.randomseed) else random.randrange(
-        sys.maxsize)  # get a random seed so that we can reproducibly do the cross validation setup
+    seed = args.randomseed if (args.randomseed) else random.randrange(sys.maxsize) % (2**32)  # get a random seed so that we can reproducibly do the cross validation setup
 
     random.seed(seed)  # set the seed
     np.random.seed(seed)
@@ -333,6 +333,9 @@ def runCohortFinder(args):
     output["groupid"] = preds
     output["testind"] = None
 
+    sil_score = silhouette_score(output[['embed_x','embed_y']], preds)
+    db_score = davies_bouldin_score(output[['embed_x','embed_y']], preds)
+    ch_score = calinski_harabasz_score(output[['embed_x','embed_y']], preds)
 
     # --- assign test or train status
     labels = data[labelcol] if labelcol else pd.Series(np.zeros(len(preds)))
@@ -382,6 +385,7 @@ def runCohortFinder(args):
 
             colorlist = ['#%02x%02x%02x' % (x[0], x[1], x[2]) for x in (np.asarray(cmap.colors) * 255).astype(np.uint8)]
             cf_out.write(f"#colorlist:{','.join(list(colorlist))}\n")
+            cf_out.write(f"BE SCORE: silhouette_score={sil_score} | davies_bouldin_score={db_score} | calinski_harabasz_score={ch_score}\n")
             output.to_csv(cf_out, sep="\t", line_terminator='\n', index=False)
 
 
@@ -436,7 +440,8 @@ def runCohortFinder(args):
 
         plt.savefig(os.path.join(plots_outdir, f'allgroups.png'))
         plt.close(fig)
-
+    logging.info(
+        f'*****BE SCORE: silhouette_score={sil_score} | davies_bouldin_score={db_score} | calinski_harabasz_score={ch_score}*****')
     logging.info(f'CohortFinder has run successfully!')
 
     return output, preds

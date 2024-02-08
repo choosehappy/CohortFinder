@@ -111,10 +111,15 @@ options:
 ```
 
 Example run command:
-```
+``` python
 python3 -m cohortfinder -n 4 -t 0.3 "/full/path/to/your/results.tsv"
 ```
-Replace the filepath with a real file path 
+Replace the filepath with a real file path, for example, we upload some sample data into the path "/test/histoqc_outdir/".
+You can do a quick test by using the following command
+
+``` python
+python3 -m cohortfinder -n 3 -t 0.3 -r 200  "/cohortfinder/test/histoqc_outdir/results.tsv"
+```
 
 
 
@@ -203,17 +208,27 @@ The results_cohortfinder.tsv has four more columns than the histoqc/mrqy results
 
 Each point represents a patient and different colors represent different batch effect groups
 
-<img src="/figs/embed.png" alt="embed" style="zoom:25%;" />
+<img src="/CohortFinder/cohortfinder/figs/embed.png" alt="embed" style="zoom:25%;" />
 
 #### 3. Patient partition plot
 
  'x' represents the patients were split into training set and '+' means the patients were partitioned into testing set. You can also find the patients information detail in the ***results_cohortfinder.tsv*** file.
 
-<img src="/figs/embed_split.png" alt="embed_split" style="zoom:25%;" />
+<img src="/CohortFinder/cohortfinder/figs/embed_split.png" alt="embed_split" style="zoom:25%;" />
 
 #### 4. The visual cluster results
 
-![groupingresults](/figs/groupingresults.png)
+![groupingresults]("/CohortFinder/cohortfinder/figs/groupingresults.png")
+
+#### 5. BE score
+
+We also introduce three clustering metrics: the silhouette coefficient, the Davies-Bouldin index, and the Calinski-Harabasz index as BE scores. Here are the description of these 3 measurements. The measurements can be found in both cohortfinder tsv file and log file. Better score represents the cohort has severe batch-effect.
+
+| Quality control metric | Description                                                  |
+| ---------------------- | ------------------------------------------------------------ |
+| Silhouette Coefficient(mean Silhouette Coefficient over all samples)                   | Measures how similar an object is to its own cluster compared to other clusters. The value ranges from -1 to 1. A high value indicates appropriate clustering.                                     |
+| Davies-Bouldin index                    | Measures how similar an object is to its own cluster compared to other clusters. The value ranges from -1 to 1. A high value indicates appropriate clustering.   |
+| Calinski-Harabasz index                    | 1. Between-Cluster Dispersion: It measures how far the clusters are from each other. For good clustering, this should be as large as possible. 2.Within-Cluster Dispersion: It measures how compact the clusters are internally. For good clustering, this should be as small as possible. |
 
 
 # Citation
