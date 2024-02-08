@@ -208,17 +208,17 @@ The results_cohortfinder.tsv has four more columns than the histoqc/mrqy results
 
 Each point represents a patient and different colors represent different batch effect groups
 
-<img src="/CohortFinder/cohortfinder/figs/embed.png" alt="embed" style="zoom:25%;" />
+<img src="/cohortfinder/figs/embed.png" alt="embed" style="zoom:25%;" />
 
 #### 3. Patient partition plot
 
  'x' represents the patients were split into training set and '+' means the patients were partitioned into testing set. You can also find the patients information detail in the ***results_cohortfinder.tsv*** file.
 
-<img src="/CohortFinder/cohortfinder/figs/embed_split.png" alt="embed_split" style="zoom:25%;" />
+<img src="/cohortfinder/figs/embed_split.png" alt="embed_split" style="zoom:25%;" />
 
 #### 4. The visual cluster results
 
-![groupingresults]("/CohortFinder/cohortfinder/figs/groupingresults.png")
+![groupingresults]("/cohortfinder/figs/groupingresults.png")
 
 #### 5. BE score
 
