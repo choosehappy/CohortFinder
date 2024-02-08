@@ -218,7 +218,8 @@ Each point represents a patient and different colors represent different batch e
 
 #### 4. The visual cluster results
 
-![groupingresults]("/cohortfinder/figs/groupingresults.png")
+<img src="/cohortfinder/figs/groupingresults.png" alt="embed_split" style="zoom:25%;" />
+
 
 #### 5. BE score
 
