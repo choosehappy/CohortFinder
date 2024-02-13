@@ -1,0 +1,6 @@
+build/
+dist/
+**/.DS_Store
+.idea/
+*.egg-info/
+_version.py
