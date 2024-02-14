@@ -41,7 +41,7 @@ And the following python packages:
 
 5. scipy
 
-6. umap
+6. umap_learn
 
 7. pandas
 
