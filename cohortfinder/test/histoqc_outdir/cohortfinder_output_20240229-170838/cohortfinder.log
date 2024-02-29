@@ -1,0 +1,83 @@
+2024-02-29 17:08:38,483 - INFO - random seed (note down for reproducibility): 200
+2024-02-29 17:08:38,490 - INFO -                                     #dataset:filename comments     image_bounding_box  base_mag  ... deconv_c2_std  pixels_to_use                                           warnings                                        Unnamed: 96
+0   TCGA-AD-A5EJ-01Z-00-DX1.FA56CEAF-8B70-45EF-A2C...            (0, 0, 32614, 40488)        40  ...      0.020556         275660  |TCGA-AD-A5EJ-01Z-00-DX1.FA56CEAF-8B70-45EF-A2...  saveMacro Can't Read 'macro' Image from Slide'...
+1   TCGA-F4-6855-01Z-00-DX1.41ed5985-be19-4dce-aab...            (0, 0, 53717, 47510)        40  ...      0.008719         404442  |TCGA-F4-6855-01Z-00-DX1.41ed5985-be19-4dce-aa...  saveMacro Can't Read 'macro' Image from Slide'...
+2   TCGA-G4-6306-01Z-00-DX1.962227ca-b0d6-4cf4-afe...            (0, 0, 94006, 67113)        40  ...      0.009249        2826685  |TCGA-G4-6306-01Z-00-DX1.962227ca-b0d6-4cf4-af...  saveMacro Can't Read 'macro' Image from Slide'...
+3   TCGA-A6-5662-01Z-00-DX1.82569684-1c31-4346-af9...            (0, 0, 24940, 77194)        40  ...      0.015775         374354  |TCGA-A6-5662-01Z-00-DX1.82569684-1c31-4346-af...  saveMacro Can't Read 'macro' Image from Slide'...
+4   TCGA-AA-3841-01Z-00-DX1.10f98d09-027f-4495-9ad...           (0, 0, 47872, 114432)        20  ...      0.005083        2911995  |TCGA-AA-3841-01Z-00-DX1.10f98d09-027f-4495-9a...  saveMacro Can't Read 'macro' Image from Slide'...
+5   TCGA-AA-A00E-01Z-00-DX1.ABFCAF2D-287A-445F-9F3...            (0, 0, 71168, 66304)        20  ...      0.002691        3497107  |TCGA-AA-A00E-01Z-00-DX1.ABFCAF2D-287A-445F-9F...  saveMacro Can't Read 'macro' Image from Slide'...
+6   TCGA-AD-6888-01Z-00-DX1.47AE342C-4577-4D8B-904...            (0, 0, 44125, 39058)        40  ...      0.010480         772280  |TCGA-AD-6888-01Z-00-DX1.47AE342C-4577-4D8B-90...  saveMacro Can't Read 'macro' Image from Slide'...
+7   TCGA-AY-A69D-01Z-00-DX1.94582A46-7470-4265-837...           (0, 0, 134231, 37325)        40  ...      0.011631        1358618  |TCGA-AY-A69D-01Z-00-DX1.94582A46-7470-4265-83...  saveMacro Can't Read 'macro' Image from Slide'...
+8   TCGA-A6-5659-01Z-00-DX1.c671806f-013e-4d99-984...           (0, 0, 117028, 35092)        40  ...      0.013094         408505  |TCGA-A6-5659-01Z-00-DX1.c671806f-013e-4d99-98...  saveMacro Can't Read 'macro' Image from Slide'...
+9   TCGA-AA-3548-01Z-00-DX1.41949ab5-79f2-4729-9d5...           (0, 0, 44800, 100096)        20  ...      0.005839        2026302  |TCGA-AA-3548-01Z-00-DX1.41949ab5-79f2-4729-9d...  saveMacro Can't Read 'macro' Image from Slide'...
+10  TCGA-CM-6166-01Z-00-DX1.52eaa124-7ab5-4aaf-b07...           (0, 0, 142927, 84754)        40  ...      0.011694        3401177  |TCGA-CM-6166-01Z-00-DX1.52eaa124-7ab5-4aaf-b0...  saveMacro Can't Read 'macro' Image from Slide'...
+11  TCGA-AA-3562-01Z-00-DX1.e07893e6-646d-41b5-be5...            (0, 0, 80128, 61184)        20  ...      0.005643        2341560  |TCGA-AA-3562-01Z-00-DX1.e07893e6-646d-41b5-be...  saveMacro Can't Read 'macro' Image from Slide'...
+12  TCGA-AZ-4313-01Z-00-DX1.5e7ecf69-d1fd-4997-9dc...           (0, 0, 115109, 62467)        40  ...      0.023043        3583678  |TCGA-AZ-4313-01Z-00-DX1.5e7ecf69-d1fd-4997-9d...  saveMacro Can't Read 'macro' Image from Slide'...
+13  TCGA-DM-A1DA-01Z-00-DX1.00001FEF-3B63-4C6F-952...            (0, 0, 96152, 75052)        40  ...      0.013952        3417489  |TCGA-DM-A1DA-01Z-00-DX1.00001FEF-3B63-4C6F-95...  saveMacro Can't Read 'macro' Image from Slide'...
+14  TCGA-AA-A00L-01Z-00-DX1.4F57C465-BC1C-4774-B00...            (0, 0, 40192, 65792)        20  ...      0.003228         412774  |TCGA-AA-A00L-01Z-00-DX1.4F57C465-BC1C-4774-B0...  saveMacro Can't Read 'macro' Image from Slide'...
+15  TCGA-AA-3520-01Z-00-DX1.3e2b41c2-eb21-4f68-894...            (0, 0, 39680, 50432)        20  ...      0.005883         358327  |TCGA-AA-3520-01Z-00-DX1.3e2b41c2-eb21-4f68-89...  saveMacro Can't Read 'macro' Image from Slide'...
+16  TCGA-AA-3695-01Z-00-DX1.be93a101-7b57-4140-bd8...            (0, 0, 76544, 48384)        20  ...      0.005232        1617836  |TCGA-AA-3695-01Z-00-DX1.be93a101-7b57-4140-bd...  saveMacro Can't Read 'macro' Image from Slide'...
+17  TCGA-AA-3848-01Z-00-DX1.bb018b1c-7748-4865-b00...            (0, 0, 56576, 51968)        20  ...      0.005807         401938  |TCGA-AA-3848-01Z-00-DX1.bb018b1c-7748-4865-b0...  saveMacro Can't Read 'macro' Image from Slide'...
+18  TCGA-A6-A5ZU-01Z-00-DX1.8E7A136C-46C4-4233-A74...            (0, 0, 24752, 92091)        40  ...      0.011592         460702  |TCGA-A6-A5ZU-01Z-00-DX1.8E7A136C-46C4-4233-A7...  saveMacro Can't Read 'macro' Image from Slide'...
+19  TCGA-AD-6964-01Z-00-DX1.83AF88B9-C59B-48C6-A73...            (0, 0, 90169, 57947)        40  ...      0.008036        1032164  |TCGA-AD-6964-01Z-00-DX1.83AF88B9-C59B-48C6-A7...  saveMacro Can't Read 'macro' Image from Slide'...
+20  TCGA-F4-6854-01Z-00-DX1.a4d18769-1632-41e4-b49...            (0, 0, 47962, 83971)        40  ...      0.017945        1197851  |TCGA-F4-6854-01Z-00-DX1.a4d18769-1632-41e4-b4...  saveMacro Can't Read 'macro' Image from Slide'...
+21  TCGA-D5-6531-01Z-00-DX1.32241731-5890-424e-96d...           (0, 0, 152520, 84836)        40  ...      0.009816        3020051  |TCGA-D5-6531-01Z-00-DX1.32241731-5890-424e-96...  saveMacro Can't Read 'macro' Image from Slide'...
+22  TCGA-CA-5256-01Z-00-DX1.67cc2ca1-40df-4e76-be8...            (0, 0, 60432, 61254)        40  ...      0.016918        1386598  |TCGA-CA-5256-01Z-00-DX1.67cc2ca1-40df-4e76-be...  saveMacro Can't Read 'macro' Image from Slide'...
+23  TCGA-D5-6927-01Z-00-DX1.ff21d627-dbb8-4200-937...           (0, 0, 101680, 37255)        40  ...      0.006870         965995  |TCGA-D5-6927-01Z-00-DX1.ff21d627-dbb8-4200-93...  saveMacro Can't Read 'macro' Image from Slide'...
+
+[24 rows x 97 columns]
+2024-02-29 17:08:38,677 - INFO - Number of slides:	24
+2024-02-29 17:08:38,677 - WARNING - Patient column None *NOT* found, assuming no duplicates
+2024-02-29 17:08:38,678 - INFO - Number of clusters explicitly set on command line to:	3
+2024-02-29 17:08:38,678 - INFO - Column mpp_x found
+2024-02-29 17:08:38,678 - INFO - Column mpp_y found
+2024-02-29 17:08:38,678 - INFO - Column michelson_contrast found
+2024-02-29 17:08:38,678 - INFO - Column rms_contrast found
+2024-02-29 17:08:38,678 - INFO - Column grayscale_brightness found
+2024-02-29 17:08:38,678 - INFO - Column chan1_brightness found
+2024-02-29 17:08:38,678 - INFO - Column chan2_brightness found
+2024-02-29 17:08:38,678 - INFO - Column chan3_brightness found
+2024-02-29 17:08:38,678 - INFO - Column chan1_brightness_YUV found
+2024-02-29 17:08:38,678 - INFO - Column chan2_brightness_YUV found
+2024-02-29 17:08:38,678 - INFO - Column chan3_brightness_YUV found
+2024-02-29 17:08:38,697 - INFO -            mpp_x      mpp_y  michelson_contrast  rms_contrast  grayscale_brightness  chan1_brightness  chan2_brightness  chan3_brightness  chan1_brightness_YUV  chan2_brightness_YUV  chan3_brightness_YUV
+count  24.000000  24.000000           24.000000     24.000000             24.000000         24.000000         24.000000         24.000000             24.000000             24.000000             24.000000
+mean    0.244854   0.244854            0.932395      0.158662              0.567163        171.698944        133.597433        174.271350              0.586771              0.047561              0.075936
+std     0.009081   0.009081            0.072634      0.035694              0.108970         25.804071         29.565777         28.029224              0.106073              0.029254              0.036722
+min     0.232500   0.232500            0.795759      0.113849              0.323864        126.924732         64.610494        107.718211              0.354679              0.010750              0.024872
+25%     0.232500   0.232500            0.862861      0.133512              0.500137        147.277467        116.858495        157.715651              0.522393              0.021653              0.043508
+50%     0.252000   0.252000            0.958664      0.149843              0.569643        175.553081        131.472117        174.566994              0.594014              0.036575              0.073910
+75%     0.252000   0.252000            1.000000      0.170548              0.640457        187.676652        152.843982        199.321031              0.659573              0.066754              0.104301
+max     0.252000   0.252000            1.000000      0.252221              0.770871        214.240751        191.053158        211.105842              0.780502              0.102407              0.151816
+2024-02-29 17:08:44,296 - INFO - The embedding plot was successfully saved!
+2024-02-29 17:08:44,296 - INFO - Counter({1: 8, 2: 8, 0: 8})
+2024-02-29 17:08:44,312 - INFO - Num in training set: 15
+2024-02-29 17:08:44,312 - INFO - Num in testing set: 9
+2024-02-29 17:08:44,313 - INFO - Percent in testing set: 0.375
+2024-02-29 17:08:44,661 - INFO - The training/testing split embedding plot was successfully saved!
+2024-02-29 17:08:44,884 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-AA-3841-01Z-00-DX1.10f98d09-027f-4495-9ad8-7c8dc49a07d7.svs/TCGA-AA-3841-01Z-00-DX1.10f98d09-027f-4495-9ad8-7c8dc49a07d7.svs_thumb_small.png']
+2024-02-29 17:08:44,891 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-AA-A00E-01Z-00-DX1.ABFCAF2D-287A-445F-9F32-BD00D1B385C3.svs/TCGA-AA-A00E-01Z-00-DX1.ABFCAF2D-287A-445F-9F32-BD00D1B385C3.svs_thumb_small.png']
+2024-02-29 17:08:44,901 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-AA-3548-01Z-00-DX1.41949ab5-79f2-4729-9d54-c0fca1daf124.svs/TCGA-AA-3548-01Z-00-DX1.41949ab5-79f2-4729-9d54-c0fca1daf124.svs_thumb_small.png']
+2024-02-29 17:08:44,909 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-AA-3562-01Z-00-DX1.e07893e6-646d-41b5-be51-9c19d51f6743.svs/TCGA-AA-3562-01Z-00-DX1.e07893e6-646d-41b5-be51-9c19d51f6743.svs_thumb_small.png']
+2024-02-29 17:08:44,917 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-AA-A00L-01Z-00-DX1.4F57C465-BC1C-4774-B003-F7F29C6A69D0.svs/TCGA-AA-A00L-01Z-00-DX1.4F57C465-BC1C-4774-B003-F7F29C6A69D0.svs_thumb_small.png']
+2024-02-29 17:08:44,925 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-AA-3520-01Z-00-DX1.3e2b41c2-eb21-4f68-8946-92b59cc1f969.svs/TCGA-AA-3520-01Z-00-DX1.3e2b41c2-eb21-4f68-8946-92b59cc1f969.svs_thumb_small.png']
+2024-02-29 17:08:44,935 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-AA-3695-01Z-00-DX1.be93a101-7b57-4140-bd82-86c65e65ca27.svs/TCGA-AA-3695-01Z-00-DX1.be93a101-7b57-4140-bd82-86c65e65ca27.svs_thumb_small.png']
+2024-02-29 17:08:44,942 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-AA-3848-01Z-00-DX1.bb018b1c-7748-4865-b00f-42edc35b5047.svs/TCGA-AA-3848-01Z-00-DX1.bb018b1c-7748-4865-b00f-42edc35b5047.svs_thumb_small.png']
+2024-02-29 17:08:46,047 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-AD-A5EJ-01Z-00-DX1.FA56CEAF-8B70-45EF-A2C9-8AA7BEB3D88A.svs/TCGA-AD-A5EJ-01Z-00-DX1.FA56CEAF-8B70-45EF-A2C9-8AA7BEB3D88A.svs_thumb_small.png']
+2024-02-29 17:08:46,056 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-A6-5662-01Z-00-DX1.82569684-1c31-4346-af9b-c296a020f624.svs/TCGA-A6-5662-01Z-00-DX1.82569684-1c31-4346-af9b-c296a020f624.svs_thumb_small.png']
+2024-02-29 17:08:46,061 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-AY-A69D-01Z-00-DX1.94582A46-7470-4265-8371-23BC246431EE.svs/TCGA-AY-A69D-01Z-00-DX1.94582A46-7470-4265-8371-23BC246431EE.svs_thumb_small.png']
+2024-02-29 17:08:46,065 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-A6-5659-01Z-00-DX1.c671806f-013e-4d99-9841-cda5bd43eff1.svs/TCGA-A6-5659-01Z-00-DX1.c671806f-013e-4d99-9841-cda5bd43eff1.svs_thumb_small.png']
+2024-02-29 17:08:46,070 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-CM-6166-01Z-00-DX1.52eaa124-7ab5-4aaf-b074-7f89a4c53804.svs/TCGA-CM-6166-01Z-00-DX1.52eaa124-7ab5-4aaf-b074-7f89a4c53804.svs_thumb_small.png']
+2024-02-29 17:08:46,078 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-AZ-4313-01Z-00-DX1.5e7ecf69-d1fd-4997-9dcc-ab8e9f10b423.svs/TCGA-AZ-4313-01Z-00-DX1.5e7ecf69-d1fd-4997-9dcc-ab8e9f10b423.svs_thumb_small.png']
+2024-02-29 17:08:46,085 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-A6-A5ZU-01Z-00-DX1.8E7A136C-46C4-4233-A747-EBDC4F3227FB.svs/TCGA-A6-A5ZU-01Z-00-DX1.8E7A136C-46C4-4233-A747-EBDC4F3227FB.svs_thumb_small.png']
+2024-02-29 17:08:46,089 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-CA-5256-01Z-00-DX1.67cc2ca1-40df-4e76-be88-dfd93e20e017.svs/TCGA-CA-5256-01Z-00-DX1.67cc2ca1-40df-4e76-be88-dfd93e20e017.svs_thumb_small.png']
+2024-02-29 17:08:47,141 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-F4-6855-01Z-00-DX1.41ed5985-be19-4dce-aab6-de3be0f1dcca.svs/TCGA-F4-6855-01Z-00-DX1.41ed5985-be19-4dce-aab6-de3be0f1dcca.svs_thumb_small.png']
+2024-02-29 17:08:47,154 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-G4-6306-01Z-00-DX1.962227ca-b0d6-4cf4-afea-8f7c2f9b2477.svs/TCGA-G4-6306-01Z-00-DX1.962227ca-b0d6-4cf4-afea-8f7c2f9b2477.svs_thumb_small.png']
+2024-02-29 17:08:47,163 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-AD-6888-01Z-00-DX1.47AE342C-4577-4D8B-9048-0B106C5960E7.svs/TCGA-AD-6888-01Z-00-DX1.47AE342C-4577-4D8B-9048-0B106C5960E7.svs_thumb_small.png']
+2024-02-29 17:08:47,174 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-DM-A1DA-01Z-00-DX1.00001FEF-3B63-4C6F-952A-1D5F6F51CD22.svs/TCGA-DM-A1DA-01Z-00-DX1.00001FEF-3B63-4C6F-952A-1D5F6F51CD22.svs_thumb_small.png']
+2024-02-29 17:08:47,183 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-AD-6964-01Z-00-DX1.83AF88B9-C59B-48C6-A739-85ACB8F8ECA9.svs/TCGA-AD-6964-01Z-00-DX1.83AF88B9-C59B-48C6-A739-85ACB8F8ECA9.svs_thumb_small.png']
+2024-02-29 17:08:47,192 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-F4-6854-01Z-00-DX1.a4d18769-1632-41e4-b49d-4a88d36e21ab.svs/TCGA-F4-6854-01Z-00-DX1.a4d18769-1632-41e4-b49d-4a88d36e21ab.svs_thumb_small.png']
+2024-02-29 17:08:47,200 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-D5-6531-01Z-00-DX1.32241731-5890-424e-96d5-b897e770f03c.svs/TCGA-D5-6531-01Z-00-DX1.32241731-5890-424e-96d5-b897e770f03c.svs_thumb_small.png']
+2024-02-29 17:08:47,211 - INFO - This is the filename name: ['cohortfinder/test/histoqc_outdir/TCGA-D5-6927-01Z-00-DX1.ff21d627-dbb8-4200-937b-f8be8b86b6d4.svs/TCGA-D5-6927-01Z-00-DX1.ff21d627-dbb8-4200-937b-f8be8b86b6d4.svs_thumb_small.png']
+2024-02-29 17:08:48,732 - INFO - *****BE SCORE: silhouette_score=0.6700322031974792 | davies_bouldin_score=0.44369831759656636 | calinski_harabasz_score=124.35268736116517*****
+2024-02-29 17:08:48,732 - INFO - CohortFinder has run successfully!
