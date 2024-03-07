@@ -391,7 +391,7 @@ def runCohortFinder(args):
             colorlist = ['#%02x%02x%02x' % (x[0], x[1], x[2]) for x in (np.asarray(cmap.colors) * 255).astype(np.uint8)]
             cf_out.write(f"#colorlist:{','.join(list(colorlist))}\n")
             cf_out.write(f"BE SCORE: silhouette_score={sil_score} | davies_bouldin_score={db_score} | calinski_harabasz_score={ch_score}\n")
-            output.to_csv(cf_out, sep="\t", line_terminator='\n', index=False)
+            output.to_csv(cf_out, sep="\t", lineterminator='\n', index=False)
 
 
         # ------------------------- MAKE GROUP PLOTS ------------------------- #
