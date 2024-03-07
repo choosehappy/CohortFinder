@@ -3,9 +3,5 @@ dist/
 **/.DS_Store
 .idea/
 *.egg-info/
-<<<<<<< HEAD
 _version.py
 __pycache__/
-=======
-_version.py
->>>>>>> main
