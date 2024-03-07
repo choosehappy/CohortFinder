@@ -145,6 +145,12 @@ def draw_plot(embedding,pred,cmap,linewidths,plots_outdir,suffix,testind=None):
         plt.savefig(os.path.join(plots_outdir, f'{suffix}.png'))
     return
 
+def batch_effect_score_calculation(output,preds):
+    sil_score = silhouette_score(output[['embed_x', 'embed_y']], preds)
+    db_score = davies_bouldin_score(output[['embed_x', 'embed_y']], preds)
+    ch_score = calinski_harabasz_score(output[['embed_x', 'embed_y']], preds)
+    return sil_score,db_score,ch_score
+
 def runCohortFinder(args):
     """
     Using the output tsv file from HistoQC/MRQy, produce a new tsv file containing four new columns: embed_x, embed_y, groupid, testind
@@ -333,9 +339,8 @@ def runCohortFinder(args):
     output["groupid"] = preds
     output["testind"] = None
 
-    sil_score = silhouette_score(output[['embed_x','embed_y']], preds)
-    db_score = davies_bouldin_score(output[['embed_x','embed_y']], preds)
-    ch_score = calinski_harabasz_score(output[['embed_x','embed_y']], preds)
+    # --- calculate batch-effect scores
+    sil_score,db_score,ch_score = batch_effect_score_calculation(output,preds)
 
     # --- assign test or train status
     labels = data[labelcol] if labelcol else pd.Series(np.zeros(len(preds)))
@@ -444,7 +449,7 @@ def runCohortFinder(args):
         f'*****BE SCORE: silhouette_score={sil_score} | davies_bouldin_score={db_score} | calinski_harabasz_score={ch_score}*****')
     logging.info(f'CohortFinder has run successfully!')
 
-    return output, preds
+    return output,preds,sil_score,db_score,ch_score
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Split histoqc/mrqy tsv into training and testing')
@@ -469,7 +474,7 @@ if __name__ == '__main__':
     print(args)
 
     # ------------------------- RUN COHORTFINDER ------------------------- #
-    output, preds = runCohortFinder(args)
+    output, preds,sil_score,db_score,ch_score = runCohortFinder(args)
 
     logging.shutdown()
 
