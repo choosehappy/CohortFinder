@@ -4,3 +4,4 @@ dist/
 .idea/
 *.egg-info/
 _version.py
+__pycache__/
