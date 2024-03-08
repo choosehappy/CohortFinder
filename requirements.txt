@@ -1,7 +1,7 @@
 matplotlib==3.3.4
 numpy==1.23.5
 opencv_python_headless==4.9.0.80
-pandas==2.2.1
+pandas==2.0.3
 scikit_learn==1.1.1
 scipy==1.6.1
 umap==0.1.1
