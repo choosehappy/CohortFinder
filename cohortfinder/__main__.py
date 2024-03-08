@@ -340,7 +340,11 @@ def runCohortFinder(args):
     output["testind"] = None
 
     # --- calculate batch-effect scores
-    sil_score,db_score,ch_score = batch_effect_score_calculation(output,preds)
+    sil_score, db_score, ch_score = batch_effect_score_calculation(output,preds)
+
+    output["sil_score"] = sil_score
+    output["db_score"] = db_score
+    output["ch_score"] = ch_score
 
     # --- assign test or train status
     labels = data[labelcol] if labelcol else pd.Series(np.zeros(len(preds)))
@@ -449,7 +453,7 @@ def runCohortFinder(args):
         f'*****BE SCORE: silhouette_score={sil_score} | davies_bouldin_score={db_score} | calinski_harabasz_score={ch_score}*****')
     logging.info(f'CohortFinder has run successfully!')
 
-    return output,preds,sil_score,db_score,ch_score
+    return output
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Split histoqc/mrqy tsv into training and testing')
@@ -474,7 +478,7 @@ if __name__ == '__main__':
     print(args)
 
     # ------------------------- RUN COHORTFINDER ------------------------- #
-    output, preds,sil_score,db_score,ch_score = runCohortFinder(args)
+    output = runCohortFinder(args)
 
     logging.shutdown()
 
