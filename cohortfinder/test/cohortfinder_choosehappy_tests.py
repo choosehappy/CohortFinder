@@ -1,5 +1,5 @@
 import unittest
-from cohortfinder.cohortfinder_colormod_original import runCohortFinder
+from ..cohortfinder import runCohortFinder
 from argparse import Namespace
 
 class TestCohortFinder(unittest.TestCase):
