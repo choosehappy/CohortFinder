@@ -138,10 +138,10 @@ def draw_plot(embedding,pred,cmap,linewidths,plots_outdir,suffix,testind=None):
         plt.savefig(os.path.join(plots_outdir, f'{suffix}.png'))
     return
 
-def batch_effect_score_calculation(output,preds):
-    sil_score = silhouette_score(output[['embed_x', 'embed_y']], preds)
-    db_score = davies_bouldin_score(output[['embed_x', 'embed_y']], preds)
-    ch_score = calinski_harabasz_score(output[['embed_x', 'embed_y']], preds)
+def batch_effect_score_calculation(output):
+    sil_score = silhouette_score(output[['embed_x', 'embed_y']], output['groupid'])
+    db_score = davies_bouldin_score(output[['embed_x', 'embed_y']], output['groupid'])
+    ch_score = calinski_harabasz_score(output[['embed_x', 'embed_y']], output['groupid'])
     return sil_score,db_score,ch_score
 
 def runCohortFinder(args):
@@ -333,11 +333,7 @@ def runCohortFinder(args):
     output["testind"] = None
 
     # --- calculate batch-effect scores
-    sil_score, db_score, ch_score = batch_effect_score_calculation(output,preds)
-
-    output["sil_score"] = sil_score
-    output["db_score"] = db_score
-    output["ch_score"] = ch_score
+    sil_score, db_score, ch_score = batch_effect_score_calculation(output)
 
     # --- assign test or train status
     labels = data[labelcol] if labelcol else pd.Series(np.zeros(len(preds)))
@@ -446,4 +442,4 @@ def runCohortFinder(args):
         f'*****BE SCORE: silhouette_score={sil_score} | davies_bouldin_score={db_score} | calinski_harabasz_score={ch_score}*****')
     logging.info(f'CohortFinder has run successfully!')
 
-    return output
+    return output, sil_score, db_score, ch_score
