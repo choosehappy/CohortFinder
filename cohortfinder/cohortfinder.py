@@ -139,9 +139,11 @@ def draw_plot(embedding,pred,cmap,linewidths,plots_outdir,suffix,testind=None):
     return
 
 def batch_effect_score_calculation(output):
-    sil_score = silhouette_score(output[['embed_x', 'embed_y']], output['groupid'])
-    db_score = davies_bouldin_score(output[['embed_x', 'embed_y']], output['groupid'])
-    ch_score = calinski_harabasz_score(output[['embed_x', 'embed_y']], output['groupid'])
+    embed_coords = output[['embed_x', 'embed_y']]
+    group_id_preds = output['groupid']
+    sil_score = silhouette_score(embed_coords, group_id_preds)
+    db_score = davies_bouldin_score(embed_coords, group_id_preds)
+    ch_score = calinski_harabasz_score(embed_coords, group_id_preds)
     return sil_score,db_score,ch_score
 
 def runCohortFinder(args):
