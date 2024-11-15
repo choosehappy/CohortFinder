@@ -237,7 +237,16 @@ We also introduce three clustering metrics: the silhouette coefficient, the Davi
 Please use below to cite this paper if you find this repository useful or if you use the software shared here in your research.
 
 ```
-Fan, F., Martinez, G., DeSilvio, T. et al. CohortFinder: an open-source tool for data-driven partitioning of digital pathology and imaging cohorts to yield robust machine-learning models. npj Imaging 2, 15 (2024). https://doi.org/10.1038/s44303-024-00018-2
+@article{fan2024cohortfinder,
+  author    = {Fan, Fan and Martinez, Gabriel and DeSilvio, Thomas and others},
+  title     = {CohortFinder: an open-source tool for data-driven partitioning of digital pathology and imaging cohorts to yield robust machine-learning models},
+  journal   = {npj Imaging},
+  volume    = {2},
+  pages     = {15},
+  year      = {2024},
+  doi       = {10.1038/s44303-024-00018-2},
+  url       = {https://doi.org/10.1038/s44303-024-00018-2}
+}
 ```
 
 [CohortFinder Paper link](https://www.nature.com/articles/s44303-024-00018-2)
