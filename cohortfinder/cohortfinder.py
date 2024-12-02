@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 import umap.umap_ as umap
 from random import shuffle
+from itertools import zip_longest
 
 from scipy.stats import ttest_ind
 from sklearn import preprocessing
@@ -144,6 +145,58 @@ def batch_effect_score_calculation(output):
     ch_score = calinski_harabasz_score(output[['embed_x', 'embed_y']], output['groupid'])
     return sil_score,db_score,ch_score
 
+def select_points_optimized(points):
+    """
+    Selects points in an optimized manner based on their distances.
+
+    Parameters:
+    - points (numpy.ndarray): An array of points to be selected from.
+
+    Returns:
+    - selected_indices (list): A list of indices representing the selected points.
+    """
+    # Convert the input points to a numpy array
+    points = np.array(points)
+    num_points = points.shape[0]
+    
+    # Pre-compute the distance matrix for all points
+    distance_matrix = np.linalg.norm(points[:, np.newaxis] - points[np.newaxis, :], axis=2)
+
+    # Initialize the list of selected indices
+    selected_indices = []
+    
+    # Calculate the center of mass of the points
+    center_of_mass = np.mean(points, axis=0)
+
+    # Select the point nearest to the center of mass
+    distances_from_com = np.linalg.norm(points - center_of_mass, axis=1)
+    furthest_index = np.argmin(distances_from_com)
+    selected_indices.append(furthest_index)
+    
+    # Track remaining points
+    remaining_indices = set(range(num_points))
+    remaining_indices.remove(furthest_index)
+    
+    # Repeat until no points are left
+    while remaining_indices:
+        # Calculate the average distance from the selected points to each remaining point
+        avg_distances = []
+        
+        # Calculate average distances for all remaining points
+        for index in remaining_indices:
+            distances = distance_matrix[index, selected_indices]  # Efficiently get distances using pre-computed matrix
+            avg_distance = np.mean(distances)
+            avg_distances.append(avg_distance)
+        
+        # Select the point with the maximum average distance
+        next_index = max(remaining_indices, key=lambda idx: avg_distances[list(remaining_indices).index(idx)])
+        
+        # Update the selected points
+        selected_indices.append(next_index)
+        remaining_indices.remove(next_index)
+
+    return selected_indices
+
 def runCohortFinder(args):
     """
     Using the output tsv file from HistoQC/MRQy, produce a new tsv file containing four new columns: embed_x, embed_y, groupid, testind
@@ -274,6 +327,27 @@ def runCohortFinder(args):
 
     embedding = umap.UMAP(metric="correlation",random_state=seed).fit_transform(datasub)
     clustered = KMeans(n_clusters=nclusters,random_state=seed).fit(embedding)
+
+    # --- select slides in an optimized manner based on their distances for annotation order
+    selected_order_clusters = select_points_optimized(clustered.cluster_centers_)
+    labels = clustered.labels_
+    indices = np.arange(len(embedding))
+    clustered_indices = [indices[labels == i].tolist() for i in range(clustered.n_clusters)]
+    clustered_indices_ordered=[clustered_indices[i] for i in selected_order_clusters]
+    for idx,co in enumerate(clustered_indices_ordered):
+        so = select_points_optimized(embedding[co,:])
+        clustered_indices_ordered[idx]=[co[s] for s in so]
+
+    final_list=[]
+    for values in zip_longest(*clustered_indices_ordered):
+        for value in values:
+            if value is not None:
+                final_list.append(value) 
+    priority_index = [None] * len(embedding)
+    for idx, co in enumerate(final_list):
+        priority_index[co] = idx
+
+
     #clustered = SpectralClustering(n_clusters=nclusters).fit(embedding)
     preds = clustered.labels_
 
@@ -331,6 +405,7 @@ def runCohortFinder(args):
     output["embed_y"] = embedding[:, 1]
     output["groupid"] = preds
     output["testind"] = None
+    output["priority"] = priority_index
 
     # --- calculate batch-effect scores
     sil_score, db_score, ch_score = batch_effect_score_calculation(output)
