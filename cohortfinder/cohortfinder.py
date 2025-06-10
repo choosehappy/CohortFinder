@@ -144,6 +144,7 @@ def batch_effect_score_calculation(output):
     sil_score = silhouette_score(embed_coords, group_id_preds)
     db_score = davies_bouldin_score(embed_coords, group_id_preds)
     ch_score = calinski_harabasz_score(embed_coords, group_id_preds)
+
     return sil_score,db_score,ch_score
 
 def runCohortFinder(args):
