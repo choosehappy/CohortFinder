@@ -208,17 +208,17 @@ The results_cohortfinder.tsv has four more columns than the histoqc/mrqy results
 
 Each point represents a patient and different colors represent different batch effect groups
 
-<img src="/cohortfinder/figs/embed.png" alt="embed" style="zoom:25%;" />
+<img src="./cohortfinder/figs/embed.png" alt="embed" style="zoom:25%;" />
 
 #### 3. Patient partition plot
 
  'x' represents the patients were split into training set and '+' means the patients were partitioned into testing set. You can also find the patients information detail in the ***results_cohortfinder.tsv*** file.
 
-<img src="/cohortfinder/figs/embed_split.png" alt="embed_split" style="zoom:25%;" />
+<img src="./cohortfinder/figs/embed_split.png" alt="embed_split" style="zoom:25%;" />
 
 #### 4. The visual cluster results
 
-<img src="/cohortfinder/figs/groupingresults.png" alt="embed_split" style="zoom:25%;" />
+<img src="./cohortfinder/figs/groupingresults.png" alt="embed_split" style="zoom:25%;" />
 
 
 #### 5. BE score
@@ -230,6 +230,26 @@ We also introduce three clustering metrics: the silhouette coefficient, the Davi
 | Silhouette Coefficient(mean Silhouette Coefficient over all samples)                   | Measures how similar an object is to its own cluster compared to other clusters. The value ranges from -1 to 1. A high value indicates appropriate clustering.                                     |
 | Davies-Bouldin index                    | Measures how similar an object is to its own cluster compared to other clusters. The value ranges from -1 to 1. A high value indicates appropriate clustering.   |
 | Calinski-Harabasz index                    | 1. Between-Cluster Dispersion: It measures how far the clusters are from each other. For good clustering, this should be as large as possible. 2.Within-Cluster Dispersion: It measures how compact the clusters are internally. For good clustering, this should be as small as possible. |
+
+#### 6. Priority index
+
+CohortFinder provides a visualization tool for the **priority index**, which guides the annotation workflow by ranking images based on their importance or informativeness.
+
+- **Left Plot**: Displays a 2D embedding of all images.
+  - **Point Size**: Indicates annotation priority — larger points represent higher-priority images that should be annotated earlier.
+  - **Color**: Encodes the relative ranking of the priority index, providing a visual gradient of priority.
+  - **Labels and Arrows**: Optionally highlight the top 5 highest-priority images, showing their order and making the suggested annotation path clear at a glance.
+
+- **Right Panel**: Shows thumbnails of the top 5 prioritized images to offer visual context, aiding decision-making.
+
+This visualization supports:
+- **Quality Control**  
+- **Annotation Planning**  
+- **Human-in-the-loop Workflows**
+
+It helps pathologists or researchers quickly identify which images or slides to annotate first, improving annotation efficiency and ensuring the most informative samples are reviewed early in the process.
+
+<img src="./cohortfinder/figs/priority.png" alt="embed_split" style="zoom:25%;" />
 
 
 # Citation
